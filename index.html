@@ -1,0 +1,3907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>LexiCore | Vocabulary Vault</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #0B1120;
+      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+      color: #E2E8F0;
+      padding: 1rem;
+      padding-bottom: 2rem;
+    }
+
+    /* main container */
+    .app-container {
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* header */
+    .header {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #C084FC, #60A5FA);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+    .sub {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+
+    /* cards */
+    .card {
+      background: #1E293B;
+      border-radius: 2rem;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+      transition: all 0.2s;
+    }
+
+    /* filter bar & stats */
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 1rem;
+      background: #0F172A;
+      padding: 0.9rem;
+      border-radius: 2rem;
+      border: 1px solid #334155;
+    }
+    .stat-badge {
+      background: #1E293B;
+      padding: 0.4rem 1rem;
+      border-radius: 3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .stat-badge span {
+      color: #FACC15;
+      font-weight: 700;
+    }
+
+    /* unit buttons grid */
+    .units-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1.2rem;
+    }
+    .unit-chip {
+      background: #0F172A;
+      border: 1px solid #334155;
+      padding: 0.5rem 1rem;
+      border-radius: 3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s linear;
+      color: #CBD5E1;
+    }
+    .unit-chip.active {
+      background: #3B82F6;
+      border-color: #3B82F6;
+      color: white;
+      box-shadow: 0 0 6px #3b82f670;
+    }
+    .unit-chip[data-selected="true"] {
+      background: #2D3A5E;
+      border-color: #818CF8;
+      color: #E0E7FF;
+    }
+
+    /* mode selector */
+    .mode-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 1.4rem;
+      background: #0F172A;
+      padding: 0.8rem;
+      border-radius: 2rem;
+    }
+    .mode-btn {
+      flex: 1;
+      text-align: center;
+      background: #1E293B;
+      border: none;
+      padding: 0.6rem 0;
+      border-radius: 2rem;
+      font-weight: 600;
+      color: #CBD5E1;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .mode-btn.active-mode {
+      background: #2D374B;
+      color: #FACC15;
+      box-shadow: inset 0 0 0 1px #FACC1540, 0 2px 5px #00000030;
+    }
+
+    /* study card */
+    .study-card {
+      background: #111827;
+      border-radius: 2rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      border: 1px solid #2D3A5E;
+      box-shadow: 0 15px 30px -10px black;
+    }
+    .word-original {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      word-break: break-word;
+      margin-bottom: 1rem;
+      color: #F1F5F9;
+    }
+    .part-speech {
+      font-size: 1rem;
+      background: #2D374B;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 3rem;
+      margin-bottom: 1rem;
+      color: #A5B4FC;
+    }
+    .reveal-area {
+      background: #0F172A;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      transition: all 0.2s ease;
+    }
+    .translation {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #FACC15;
+      margin-bottom: 0.6rem;
+    }
+    .example {
+      font-style: italic;
+      color: #94A3B8;
+      font-size: 0.9rem;
+      border-top: 1px dashed #334155;
+      padding-top: 0.6rem;
+    }
+    .hidden {
+      display: none;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .btn {
+      border: none;
+      padding: 0.7rem 1.6rem;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.1s linear;
+      background: #1E293B;
+      color: white;
+    }
+    .btn-know {
+      background: #10B981;
+      box-shadow: 0 2px 8px #10B98140;
+    }
+    .btn-dontknow {
+      background: #EF4444;
+      box-shadow: 0 2px 8px #EF444440;
+    }
+    .btn-show {
+      background: #3B82F6;
+      width: 100%;
+      margin-bottom: 0.8rem;
+    }
+    .reset-stat {
+      background: #334155;
+      margin-top: 0.5rem;
+      width: auto;
+      font-size: 0.75rem;
+      padding: 0.4rem 1rem;
+    }
+    .progress-text {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: #94A3B8;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      margin-top: 1.5rem;
+      color: #4B5563;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    @media (max-width: 500px) {
+      body { padding: 0.8rem; }
+      .word-original { font-size: 1.8rem; }
+      .translation { font-size: 1.3rem; }
+      .btn { padding: 0.6rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="header">
+    <h1>📖 LexiCore</h1>
+    <div class="sub">master words · unit by unit</div>
+  </div>
+
+  <!-- statistics & reset -->
+  <div class="stats-row">
+    <div class="stat-badge">📚 Total words: <span id="totalWordsCount">0</span></div>
+    <div class="stat-badge">✅ Learned: <span id="learnedCount">0</span></div>
+    <div class="stat-badge">📈 Remaining: <span id="remainingCount">0</span></div>
+    <button id="resetAllProgressBtn" class="reset-stat">⟳ reset progress</button>
+  </div>
+
+  <!-- unit filters (multi-select) -->
+  <div class="card">
+    <div style="margin-bottom: 0.5rem; font-weight: 600;">🎯 Units (tap to select)</div>
+    <div id="unitsContainer" class="units-grid"></div>
+    <div style="font-size: 0.7rem; margin-top: 6px; color:#818CF8;">* select one or multiple units</div>
+  </div>
+
+  <!-- learning mode -->
+  <div class="mode-group">
+    <button data-mode="selected" class="mode-btn active-mode">📌 Selected units</button>
+    <button data-mode="all" class="mode-btn">🌍 All words</button>
+    <button data-mode="unlearned" class="mode-btn">⚠️ Only unlearned</button>
+  </div>
+
+  <!-- main study area -->
+  <div class="study-card" id="studyArea">
+    <div id="questionBlock">
+      <div class="word-original" id="wordOriginal">loading...</div>
+      <div class="part-speech" id="partOfSpeech"></div>
+    </div>
+    <div id="revealBlock" class="reveal-area hidden">
+      <div class="translation" id="translationText"></div>
+      <div class="example" id="exampleText"></div>
+    </div>
+    <button id="revealBtn" class="btn btn-show">🔎 SHOW TRANSLATION & EXAMPLE</button>
+    <div class="action-buttons" id="actionButtons" style="display: none;">
+      <button id="knowBtn" class="btn btn-know">✅ KNOW</button>
+      <button id="dontKnowBtn" class="btn btn-dontknow">❌ DON'T KNOW</button>
+    </div>
+    <div id="progressMsg" class="progress-text"></div>
+  </div>
+  <footer>⚡ progress saved locally | mark known / unknown</footer>
+</div>
+
+<script>
+  // ---------- HARDCODED DATA (data.json shape) ----------
+  // As requested: I embed the exact sample data (unit 8 words from example + additional few to demonstrate multi-unit)
+  // In real scenario you'd fetch data.json, but requirement says hardcode during dev.
+  // I'll include the provided unit 8 words, plus create dummy unit 7 and unit 9 to show multiple unit selection.
+  const RAW_DATA = [
+  {
+    "id": 1,
+    "part_of_speech": "v",
+    "original": "advance",
+    "translation_ru": "продвигаться, делать прогресс",
+    "explanation_en": "to move forward or make progress",
+    "unit": 1,
+    "example": "We need to advance to the next level."
+  },
+  {
+    "id": 2,
+    "part_of_speech": "v",
+    "original": "assess",
+    "translation_ru": "оценивать",
+    "explanation_en": "to evaluate or judge the quality or importance of something",
+    "unit": 1,
+    "example": "The teacher will assess your work."
+  },
+  {
+    "id": 3,
+    "part_of_speech": "adj",
+    "original": "capable",
+    "translation_ru": "способный",
+    "explanation_en": "having the ability or skill to do something",
+    "unit": 1,
+    "example": "She is capable of solving complex problems."
+  },
+  {
+    "id": 4,
+    "part_of_speech": "n",
+    "original": "clarity",
+    "translation_ru": "ясность",
+    "explanation_en": "the quality of being clear and easy to understand",
+    "unit": 1,
+    "example": "The instructions lacked clarity."
+  },
+  {
+    "id": 5,
+    "part_of_speech": "n",
+    "original": "contact",
+    "translation_ru": "контакт, связь",
+    "explanation_en": "communication or connection with someone",
+    "unit": 1,
+    "example": "I stay in contact with my friends."
+  },
+  {
+    "id": 6,
+    "part_of_speech": "adj",
+    "original": "effective",
+    "translation_ru": "эффективный",
+    "explanation_en": "producing the intended result; successful",
+    "unit": 1,
+    "example": "This is an effective method."
+  },
+  {
+    "id": 7,
+    "part_of_speech": "n",
+    "original": "enthusiasm",
+    "translation_ru": "энтузиазм",
+    "explanation_en": "strong excitement or interest",
+    "unit": 1,
+    "example": "He showed great enthusiasm for the project."
+  },
+  {
+    "id": 8,
+    "part_of_speech": "adj",
+    "original": "ethical",
+    "translation_ru": "этичный",
+    "explanation_en": "related to moral principles or standards of behavior",
+    "unit": 1,
+    "example": "That decision is not ethical."
+  },
+  {
+    "id": 9,
+    "part_of_speech": "n",
+    "original": "executive",
+    "translation_ru": "руководитель",
+    "explanation_en": "a person with senior management responsibility in an organization",
+    "unit": 1,
+    "example": "The executive approved the new policy."
+  },
+  {
+    "id": 10,
+    "part_of_speech": "n",
+    "original": "initiative",
+    "translation_ru": "инициатива",
+    "explanation_en": "the ability to take action without being told",
+    "unit": 1,
+    "example": "She took the initiative to start the cleanup."
+  },
+  {
+    "id": 11,
+    "part_of_speech": "n",
+    "original": "innovation",
+    "translation_ru": "инновация",
+    "explanation_en": "the introduction of new ideas or methods",
+    "unit": 1,
+    "example": "Innovation drives the tech industry."
+  },
+  {
+    "id": 12,
+    "part_of_speech": "n",
+    "original": "motivation",
+    "translation_ru": "мотивация",
+    "explanation_en": "the reason or drive for doing something",
+    "unit": 1,
+    "example": "His motivation was to help others."
+  },
+  {
+    "id": 13,
+    "part_of_speech": "n",
+    "original": "perspective",
+    "translation_ru": "точка зрения",
+    "explanation_en": "a particular way of thinking about or understanding something",
+    "unit": 1,
+    "example": "Let's look at it from another perspective."
+  },
+  {
+    "id": 14,
+    "part_of_speech": "v",
+    "original": "promote",
+    "translation_ru": "продвигать, способствовать",
+    "explanation_en": "to encourage or support the development of something",
+    "unit": 1,
+    "example": "They promote healthy living."
+  },
+  {
+    "id": 15,
+    "part_of_speech": "adj",
+    "original": "realistic",
+    "translation_ru": "реалистичный",
+    "explanation_en": "based on what is practical or possible",
+    "unit": 1,
+    "example": "Set a realistic goal."
+  },
+  {
+    "id": 16,
+    "part_of_speech": "n",
+    "original": "responsibility",
+    "translation_ru": "ответственность",
+    "explanation_en": "a duty or obligation to deal with something",
+    "unit": 1,
+    "example": "It's your responsibility to lock the door."
+  },
+  {
+    "id": 17,
+    "part_of_speech": "n",
+    "original": "role",
+    "translation_ru": "роль",
+    "explanation_en": "a function or position that someone has",
+    "unit": 1,
+    "example": "What is your role in the team?"
+  },
+  {
+    "id": 18,
+    "part_of_speech": "n",
+    "original": "style",
+    "translation_ru": "стиль",
+    "explanation_en": "a particular way of doing or expressing something",
+    "unit": 1,
+    "example": "I like your style of writing."
+  },
+  {
+    "id": 19,
+    "part_of_speech": "v. phr",
+    "original": "take on",
+    "translation_ru": "брать на себя (ответственность или задачу)",
+    "explanation_en": "to accept responsibility or a task",
+    "unit": 1,
+    "example": "She took on the challenge."
+  },
+  {
+    "id": 20,
+    "part_of_speech": "n",
+    "original": "title",
+    "translation_ru": "должность, название",
+    "explanation_en": "a name or position given to a job or work",
+    "unit": 1,
+    "example": "His title is Manager."
+  },
+  {
+    "id": 21,
+    "part_of_speech": "prep",
+    "original": "versus",
+    "translation_ru": "против",
+    "explanation_en": "in contrast to; against",
+    "unit": 1,
+    "example": "It's nature versus nurture."
+  },
+  {
+    "id": 22,
+    "part_of_speech": "n",
+    "original": "bias",
+    "translation_ru": "предвзятость",
+    "explanation_en": "an unfair preference or opinion that influences judgment",
+    "unit": 2,
+    "example": "The article showed a clear bias."
+  },
+  {
+    "id": 23,
+    "part_of_speech": "n",
+    "original": "chaos",
+    "translation_ru": "хаос",
+    "explanation_en": "a state of complete disorder or confusion",
+    "unit": 2,
+    "example": "The storm left chaos behind."
+  },
+  {
+    "id": 24,
+    "part_of_speech": "v",
+    "original": "embrace",
+    "translation_ru": "принимать, охватывать",
+    "explanation_en": "to accept or support something willingly",
+    "unit": 2,
+    "example": "She embraced the new technology."
+  },
+  {
+    "id": 25,
+    "part_of_speech": "n",
+    "original": "feature",
+    "translation_ru": "особенность, функция",
+    "explanation_en": "an important or noticeable part of something",
+    "unit": 2,
+    "example": "The phone has a new feature."
+  },
+  {
+    "id": 26,
+    "part_of_speech": "v",
+    "original": "grant",
+    "translation_ru": "предоставлять",
+    "explanation_en": "to give or allow something officially",
+    "unit": 2,
+    "example": "They granted him permission to leave."
+  },
+  {
+    "id": 27,
+    "part_of_speech": "v",
+    "original": "imply",
+    "translation_ru": "подразумевать",
+    "explanation_en": "to suggest something without stating it directly",
+    "unit": 2,
+    "example": "Are you implying that I am wrong?"
+  },
+  {
+    "id": 28,
+    "part_of_speech": "adj",
+    "original": "inflexible",
+    "translation_ru": "негибкий",
+    "explanation_en": "unwilling or unable to change or adapt",
+    "unit": 2,
+    "example": "His schedule is inflexible."
+  },
+  {
+    "id": 29,
+    "part_of_speech": "adj",
+    "original": "legal",
+    "translation_ru": "легальный",
+    "explanation_en": "allowed by law",
+    "unit": 2,
+    "example": "Is that action legal?"
+  },
+  {
+    "id": 30,
+    "part_of_speech": "v",
+    "original": "manufacture",
+    "translation_ru": "производить",
+    "explanation_en": "to produce goods, usually in large quantities using machines",
+    "unit": 2,
+    "example": "They manufacture cars."
+  },
+  {
+    "id": 31,
+    "part_of_speech": "adv",
+    "original": "moderately",
+    "translation_ru": "умеренно",
+    "explanation_en": "to a medium degree; not extremely",
+    "unit": 2,
+    "example": "The food was moderately priced."
+  },
+  {
+    "id": 32,
+    "part_of_speech": "n",
+    "original": "monopoly",
+    "translation_ru": "монополия",
+    "explanation_en": "complete control of a market or product by one company or group",
+    "unit": 2,
+    "example": "The company has a monopoly on the software."
+  },
+  {
+    "id": 33,
+    "part_of_speech": "v",
+    "original": "obtain",
+    "translation_ru": "получать",
+    "explanation_en": "to get or acquire something",
+    "unit": 2,
+    "example": "You need a license to obtain a gun."
+  },
+  {
+    "id": 34,
+    "part_of_speech": "adj",
+    "original": "open-minded",
+    "translation_ru": "открытый к новому",
+    "explanation_en": "willing to consider new ideas or opinions",
+    "unit": 2,
+    "example": "Try to be open-minded."
+  },
+  {
+    "id": 35,
+    "part_of_speech": "v. phr",
+    "original": "point out",
+    "translation_ru": "указывать",
+    "explanation_en": "to draw attention to or indicate something",
+    "unit": 2,
+    "example": "He pointed out my mistake."
+  },
+  {
+    "id": 36,
+    "part_of_speech": "n",
+    "original": "purchase",
+    "translation_ru": "покупка",
+    "explanation_en": "the act of buying something",
+    "unit": 2,
+    "example": "I made a big purchase today."
+  },
+  {
+    "id": 37,
+    "part_of_speech": "v",
+    "original": "recognize",
+    "translation_ru": "узнавать, признавать",
+    "explanation_en": "to identify or acknowledge something as familiar or true",
+    "unit": 2,
+    "example": "I recognized her voice."
+  },
+  {
+    "id": 38,
+    "part_of_speech": "v",
+    "original": "revert",
+    "translation_ru": "возвращаться",
+    "explanation_en": "to return to a previous state or condition",
+    "unit": 2,
+    "example": "The garden reverted to wild."
+  },
+  {
+    "id": 39,
+    "part_of_speech": "n",
+    "original": "shade",
+    "translation_ru": "оттенок, тень",
+    "explanation_en": "an area of darkness or slight difference in color",
+    "unit": 2,
+    "example": "We sat in the shade."
+  },
+  {
+    "id": 40,
+    "part_of_speech": "v",
+    "original": "stifle",
+    "translation_ru": "подавлять",
+    "explanation_en": "to prevent something from developing or expressing",
+    "unit": 2,
+    "example": "Don't stifle your creativity."
+  },
+  {
+    "id": 41,
+    "part_of_speech": "adj",
+    "original": "stimulating",
+    "translation_ru": "стимулирующий",
+    "explanation_en": "encouraging interest, excitement, or thought",
+    "unit": 2,
+    "example": "It was a stimulating discussion."
+  },
+  {
+    "id": 42,
+    "part_of_speech": "v. phr",
+    "original": "stumble upon",
+    "translation_ru": "наткнуться случайно",
+    "explanation_en": "to discover something by chance",
+    "unit": 2,
+    "example": "I stumbled upon a great cafe."
+  },
+  {
+    "id": 43,
+    "part_of_speech": "n",
+    "original": "theme",
+    "translation_ru": "тема",
+    "explanation_en": "the main subject or idea of something",
+    "unit": 2,
+    "example": "The party had a Hawaiian theme."
+  },
+  {
+    "id": 44,
+    "part_of_speech": "v",
+    "original": "trademark",
+    "translation_ru": "регистрировать товарный знак",
+    "explanation_en": "to legally register a brand name or symbol",
+    "unit": 2,
+    "example": "They trademarked their logo."
+  },
+  {
+    "id": 45,
+    "part_of_speech": "v. phr",
+    "original": "turn out",
+    "translation_ru": "оказаться",
+    "explanation_en": "to result in a particular way; to prove to be",
+    "unit": 2,
+    "example": "Everything turned out fine."
+  },
+  {
+    "id": 46,
+    "part_of_speech": "n",
+    "original": "agency",
+    "translation_ru": "агентство",
+    "explanation_en": "an organization that provides a particular service, often on behalf of others",
+    "unit": 3,
+    "example": "She works at an advertising agency."
+  },
+  {
+    "id": 47,
+    "part_of_speech": "n",
+    "original": "asset",
+    "translation_ru": "актив",
+    "explanation_en": "something valuable that a person or organization owns",
+    "unit": 3,
+    "example": "His house is his biggest asset."
+  },
+  {
+    "id": 48,
+    "part_of_speech": "v",
+    "original": "balance",
+    "translation_ru": "балансировать",
+    "explanation_en": "to keep something steady or in the correct proportion",
+    "unit": 3,
+    "example": "Try to balance work and life."
+  },
+  {
+    "id": 49,
+    "part_of_speech": "adj",
+    "original": "current",
+    "translation_ru": "текущий",
+    "explanation_en": "happening now; present",
+    "unit": 3,
+    "example": "What is your current address?"
+  },
+  {
+    "id": 50,
+    "part_of_speech": "n",
+    "original": "debt",
+    "translation_ru": "долг",
+    "explanation_en": "money that is owed to someone",
+    "unit": 3,
+    "example": "He is in deep debt."
+  },
+  {
+    "id": 51,
+    "part_of_speech": "n",
+    "original": "entrepreneur",
+    "translation_ru": "предприниматель",
+    "explanation_en": "a person who starts and runs a business, taking financial risks",
+    "unit": 3,
+    "example": "The entrepreneur built a startup."
+  },
+  {
+    "id": 52,
+    "part_of_speech": "n",
+    "original": "insurance",
+    "translation_ru": "страховка",
+    "explanation_en": "an arrangement for protection against financial loss",
+    "unit": 3,
+    "example": "Do you have health insurance?"
+  },
+  {
+    "id": 53,
+    "part_of_speech": "n",
+    "original": "interest",
+    "translation_ru": "процент, интерес",
+    "explanation_en": "money paid for borrowing money or the charge for using credit",
+    "unit": 3,
+    "example": "The loan has high interest."
+  },
+  {
+    "id": 54,
+    "part_of_speech": "adj",
+    "original": "minor",
+    "translation_ru": "незначительный",
+    "explanation_en": "small in importance or degree",
+    "unit": 3,
+    "example": "It's a minor problem."
+  },
+  {
+    "id": 55,
+    "part_of_speech": "n",
+    "original": "mortgage",
+    "translation_ru": "ипотека",
+    "explanation_en": "a loan used to buy property or land",
+    "unit": 3,
+    "example": "They took out a mortgage."
+  },
+  {
+    "id": 56,
+    "part_of_speech": "adv",
+    "original": "naturally",
+    "translation_ru": "естественно",
+    "explanation_en": "in a normal or expected way; without effort",
+    "unit": 3,
+    "example": "She sings naturally."
+  },
+  {
+    "id": 57,
+    "part_of_speech": "n",
+    "original": "nutrition",
+    "translation_ru": "питание",
+    "explanation_en": "the process of providing or obtaining food needed for health",
+    "unit": 3,
+    "example": "Good nutrition is important."
+  },
+  {
+    "id": 58,
+    "part_of_speech": "n",
+    "original": "pension",
+    "translation_ru": "пенсия",
+    "explanation_en": "money paid regularly after retirement",
+    "unit": 3,
+    "example": "He lives on a pension."
+  },
+  {
+    "id": 59,
+    "part_of_speech": "adv",
+    "original": "precisely",
+    "translation_ru": "точно",
+    "explanation_en": "exactly; with accuracy",
+    "unit": 3,
+    "example": "That's precisely what I meant."
+  },
+  {
+    "id": 60,
+    "part_of_speech": "n",
+    "original": "retirement",
+    "translation_ru": "выход на пенсию",
+    "explanation_en": "the period when a person stops working permanently",
+    "unit": 3,
+    "example": "She is planning for retirement."
+  },
+  {
+    "id": 61,
+    "part_of_speech": "n",
+    "original": "series",
+    "translation_ru": "серия",
+    "explanation_en": "a number of related things arranged in order",
+    "unit": 3,
+    "example": "A series of events led to this."
+  },
+  {
+    "id": 62,
+    "part_of_speech": "v. phr",
+    "original": "set up",
+    "translation_ru": "устанавливать, организовывать",
+    "explanation_en": "to establish or start something",
+    "unit": 3,
+    "example": "They set up a new company."
+  },
+  {
+    "id": 63,
+    "part_of_speech": "n",
+    "original": "spare",
+    "translation_ru": "запасная часть",
+    "explanation_en": "an extra item kept for use when needed",
+    "unit": 3,
+    "example": "I have a spare key."
+  },
+  {
+    "id": 64,
+    "part_of_speech": "n",
+    "original": "stock",
+    "translation_ru": "акции, запас",
+    "explanation_en": "goods or materials that a business has available",
+    "unit": 3,
+    "example": "The store has stock of shoes."
+  },
+  {
+    "id": 65,
+    "part_of_speech": "n",
+    "original": "tool",
+    "translation_ru": "инструмент",
+    "explanation_en": "an object or method used to perform a task",
+    "unit": 3,
+    "example": "A hammer is a useful tool."
+  },
+  {
+    "id": 66,
+    "part_of_speech": "adj",
+    "original": "tedious",
+    "translation_ru": "утомительный",
+    "explanation_en": "boring and tiring because of being long or repetitive",
+    "unit": 3,
+    "example": "The work was tedious."
+  },
+  {
+    "id": 67,
+    "part_of_speech": "adv",
+    "original": "truly",
+    "translation_ru": "искренне",
+    "explanation_en": "genuinely; in a truthful or sincere way",
+    "unit": 3,
+    "example": "I am truly sorry."
+  },
+  {
+    "id": 68,
+    "part_of_speech": "v. phr",
+    "original": "weigh in",
+    "translation_ru": "высказываться",
+    "explanation_en": "to give an opinion or become involved in a discussion",
+    "unit": 3,
+    "example": "The expert weighed in on the debate."
+  },
+  {
+    "id": 69,
+    "part_of_speech": "adj",
+    "original": "affordable",
+    "translation_ru": "доступный по цене",
+    "explanation_en": "reasonably priced; not too expensive",
+    "unit": 4,
+    "example": "We need affordable housing."
+  },
+  {
+    "id": 70,
+    "part_of_speech": "n",
+    "original": "alternative",
+    "translation_ru": "альтернатива",
+    "explanation_en": "another option or choice",
+    "unit": 4,
+    "example": "Is there an alternative route?"
+  },
+  {
+    "id": 71,
+    "part_of_speech": "adj",
+    "original": "astonishing",
+    "translation_ru": "поразительный",
+    "explanation_en": "very surprising or impressive",
+    "unit": 4,
+    "example": "The view was astonishing."
+  },
+  {
+    "id": 72,
+    "part_of_speech": "n",
+    "original": "capacity",
+    "translation_ru": "емкость, способность",
+    "explanation_en": "the ability or amount something can hold or produce",
+    "unit": 4,
+    "example": "The hall has a capacity of 500."
+  },
+  {
+    "id": 73,
+    "part_of_speech": "v",
+    "original": "double",
+    "translation_ru": "удваивать",
+    "explanation_en": "to become twice as much or increase twofold",
+    "unit": 4,
+    "example": "My salary doubled."
+  },
+  {
+    "id": 74,
+    "part_of_speech": "adv",
+    "original": "dramatically",
+    "translation_ru": "резко, драматически",
+    "explanation_en": "suddenly or to a very great degree",
+    "unit": 4,
+    "example": "Prices have increased dramatically."
+  },
+  {
+    "id": 75,
+    "part_of_speech": "n",
+    "original": "extent",
+    "translation_ru": "степень",
+    "explanation_en": "the degree or amount to which something exists",
+    "unit": 4,
+    "example": "To some extent, you are right."
+  },
+  {
+    "id": 76,
+    "part_of_speech": "n",
+    "original": "force",
+    "translation_ru": "сила",
+    "explanation_en": "physical strength or power",
+    "unit": 4,
+    "example": "The force of the wind was strong."
+  },
+  {
+    "id": 77,
+    "part_of_speech": "v",
+    "original": "function",
+    "translation_ru": "функционировать",
+    "explanation_en": "to work or operate in a particular way",
+    "unit": 4,
+    "example": "The machine functions well."
+  },
+  {
+    "id": 78,
+    "part_of_speech": "n",
+    "original": "gear",
+    "translation_ru": "оборудование, передача",
+    "explanation_en": "equipment or machinery used for a specific purpose",
+    "unit": 4,
+    "example": "He bought camping gear."
+  },
+  {
+    "id": 79,
+    "part_of_speech": "adj",
+    "original": "hazardous",
+    "translation_ru": "опасный",
+    "explanation_en": "dangerous or risky",
+    "unit": 4,
+    "example": "This chemical is hazardous."
+  },
+  {
+    "id": 80,
+    "part_of_speech": "adj",
+    "original": "hilarious",
+    "translation_ru": "очень смешной",
+    "explanation_en": "extremely funny",
+    "unit": 4,
+    "example": "That joke was hilarious."
+  },
+  {
+    "id": 81,
+    "part_of_speech": "n",
+    "original": "intention",
+    "translation_ru": "намерение",
+    "explanation_en": "a plan or aim to do something",
+    "unit": 4,
+    "example": "I have no bad intentions."
+  },
+  {
+    "id": 82,
+    "part_of_speech": "n",
+    "original": "inventor",
+    "translation_ru": "изобретатель",
+    "explanation_en": "a person who creates or designs something new",
+    "unit": 4,
+    "example": "Edison was a great inventor."
+  },
+  {
+    "id": 83,
+    "part_of_speech": "adj",
+    "original": "noticeable",
+    "translation_ru": "заметный",
+    "explanation_en": "easy to see or recognize",
+    "unit": 4,
+    "example": "There was a noticeable change."
+  },
+  {
+    "id": 84,
+    "part_of_speech": "v",
+    "original": "power",
+    "translation_ru": "питать энергией",
+    "explanation_en": "to supply with energy or strength",
+    "unit": 4,
+    "example": "The engine powers the boat."
+  },
+  {
+    "id": 85,
+    "part_of_speech": "adv",
+    "original": "rapidly",
+    "translation_ru": "быстро",
+    "explanation_en": "very quickly",
+    "unit": 4,
+    "example": "The city is growing rapidly."
+  },
+  {
+    "id": 86,
+    "part_of_speech": "v",
+    "original": "reflect",
+    "translation_ru": "отражать, размышлять",
+    "explanation_en": "to think carefully about something or show an image",
+    "unit": 4,
+    "example": "Take time to reflect."
+  },
+  {
+    "id": 87,
+    "part_of_speech": "adj",
+    "original": "sophisticated",
+    "translation_ru": "сложный, изощренный",
+    "explanation_en": "advanced, complex, or refined",
+    "unit": 4,
+    "example": "The device is very sophisticated."
+  },
+  {
+    "id": 88,
+    "part_of_speech": "v",
+    "original": "stream",
+    "translation_ru": "течь, стримить",
+    "explanation_en": "to flow continuously",
+    "unit": 4,
+    "example": "Tears streamed down her face."
+  },
+  {
+    "id": 89,
+    "part_of_speech": "v",
+    "original": "summarize",
+    "translation_ru": "резюмировать",
+    "explanation_en": "to give a short version of the main points",
+    "unit": 4,
+    "example": "Please summarize the article."
+  },
+  {
+    "id": 90,
+    "part_of_speech": "n",
+    "original": "target",
+    "translation_ru": "цель",
+    "explanation_en": "a goal or objective to be achieved",
+    "unit": 4,
+    "example": "We met our sales target."
+  },
+  {
+    "id": 91,
+    "part_of_speech": "prep",
+    "original": "throughout",
+    "translation_ru": "везде, на протяжении",
+    "explanation_en": "in every part of something; during the whole time",
+    "unit": 4,
+    "example": "It rained throughout the day."
+  },
+  {
+    "id": 92,
+    "part_of_speech": "v",
+    "original": "alter",
+    "translation_ru": "изменять",
+    "explanation_en": "to change something slightly",
+    "unit": 5,
+    "example": "You need to alter your plans."
+  },
+  {
+    "id": 93,
+    "part_of_speech": "v",
+    "original": "buzz",
+    "translation_ru": "жужжать, быть активным",
+    "explanation_en": "to make a low, continuous humming sound; to be filled with activity or excitement",
+    "unit": 5,
+    "example": "The room buzzed with activity."
+  },
+  {
+    "id": 94,
+    "part_of_speech": "v",
+    "original": "compound",
+    "translation_ru": "усугублять",
+    "explanation_en": "to make a problem or situation worse by adding to it",
+    "unit": 5,
+    "example": "His mistake compounded the problem."
+  },
+  {
+    "id": 95,
+    "part_of_speech": "n",
+    "original": "consumer",
+    "translation_ru": "потребитель",
+    "explanation_en": "a person who buys or uses goods and services",
+    "unit": 5,
+    "example": "Consumer rights are important."
+  },
+  {
+    "id": 96,
+    "part_of_speech": "n",
+    "original": "debate",
+    "translation_ru": "дебаты",
+    "explanation_en": "a formal discussion of different opinions on a topic",
+    "unit": 5,
+    "example": "They had a heated debate."
+  },
+  {
+    "id": 97,
+    "part_of_speech": "v",
+    "original": "distribute",
+    "translation_ru": "распределять",
+    "explanation_en": "to give out or deliver something to a number of people or places",
+    "unit": 5,
+    "example": "They distribute food to the poor."
+  },
+  {
+    "id": 98,
+    "part_of_speech": "adj",
+    "original": "disturbing",
+    "translation_ru": "тревожный",
+    "explanation_en": "causing worry, discomfort, or fear",
+    "unit": 5,
+    "example": "I found the news disturbing."
+  },
+  {
+    "id": 99,
+    "part_of_speech": "v",
+    "original": "dominate",
+    "translation_ru": "доминировать",
+    "explanation_en": "to have control or a strong influence over something",
+    "unit": 5,
+    "example": "The big company dominates the market."
+  },
+  {
+    "id": 100,
+    "part_of_speech": "n",
+    "original": "ethics",
+    "translation_ru": "этика",
+    "explanation_en": "moral principles that guide behavior",
+    "unit": 5,
+    "example": "Business ethics matter."
+  },
+  {
+    "id": 101,
+    "part_of_speech": "n",
+    "original": "ignorance",
+    "translation_ru": "невежество",
+    "explanation_en": "lack of knowledge or information",
+    "unit": 5,
+    "example": "Ignorance of the law is no excuse."
+  },
+  {
+    "id": 102,
+    "part_of_speech": "n",
+    "original": "infection",
+    "translation_ru": "инфекция",
+    "explanation_en": "the invasion of the body by harmful microorganisms",
+    "unit": 5,
+    "example": "The wound caused an infection."
+  },
+  {
+    "id": 103,
+    "part_of_speech": "adj",
+    "original": "intense",
+    "translation_ru": "интенсивный",
+    "explanation_en": "very strong or extreme",
+    "unit": 5,
+    "example": "The heat was intense."
+  },
+  {
+    "id": 104,
+    "part_of_speech": "n",
+    "original": "load",
+    "translation_ru": "груз, нагрузка",
+    "explanation_en": "a heavy amount or quantity that is carried or supported",
+    "unit": 5,
+    "example": "The truck carried a heavy load."
+  },
+  {
+    "id": 105,
+    "part_of_speech": "n",
+    "original": "modification",
+    "translation_ru": "модификация",
+    "explanation_en": "a small change made to improve something",
+    "unit": 5,
+    "example": "We made a modification to the design."
+  },
+  {
+    "id": 106,
+    "part_of_speech": "n",
+    "original": "precision",
+    "translation_ru": "точность",
+    "explanation_en": "the quality of being exact and accurate",
+    "unit": 5,
+    "example": "Surgery requires precision."
+  },
+  {
+    "id": 107,
+    "part_of_speech": "n",
+    "original": "productivity",
+    "translation_ru": "производительность",
+    "explanation_en": "the rate at which work or goods are produced",
+    "unit": 5,
+    "example": "We need to increase productivity."
+  },
+  {
+    "id": 108,
+    "part_of_speech": "n",
+    "original": "reaction",
+    "translation_ru": "реакция",
+    "explanation_en": "a response to an action, event, or situation",
+    "unit": 5,
+    "example": "What was his reaction?"
+  },
+  {
+    "id": 109,
+    "part_of_speech": "n",
+    "original": "revolution",
+    "translation_ru": "революция",
+    "explanation_en": "a dramatic and wide-reaching change",
+    "unit": 5,
+    "example": "The internet caused a revolution."
+  },
+  {
+    "id": 110,
+    "part_of_speech": "v",
+    "original": "suffer",
+    "translation_ru": "страдать",
+    "explanation_en": "to experience pain, loss, or hardship",
+    "unit": 5,
+    "example": "She suffers from headaches."
+  },
+  {
+    "id": 111,
+    "part_of_speech": "n",
+    "original": "survey",
+    "translation_ru": "опрос",
+    "explanation_en": "a study that collects information from people",
+    "unit": 5,
+    "example": "They conducted a survey."
+  },
+  {
+    "id": 112,
+    "part_of_speech": "adj",
+    "original": "ultimate",
+    "translation_ru": "окончательный",
+    "explanation_en": "final; most important or extreme",
+    "unit": 5,
+    "example": "The ultimate goal is peace."
+  },
+  {
+    "id": 113,
+    "part_of_speech": "adv",
+    "original": "altogether",
+    "translation_ru": "в целом",
+    "explanation_en": "completely; in total",
+    "unit": 6,
+    "example": "Altogether, we have 10 items."
+  },
+  {
+    "id": 114,
+    "part_of_speech": "adv",
+    "original": "basically",
+    "translation_ru": "в основном",
+    "explanation_en": "in the most important or simple way",
+    "unit": 6,
+    "example": "Basically, it's simple."
+  },
+  {
+    "id": 115,
+    "part_of_speech": "v",
+    "original": "burst",
+    "translation_ru": "лопнуть, ворваться",
+    "explanation_en": "to break open suddenly or explode",
+    "unit": 6,
+    "example": "The balloon burst."
+  },
+  {
+    "id": 116,
+    "part_of_speech": "n",
+    "original": "confidence",
+    "translation_ru": "уверенность",
+    "explanation_en": "belief in one's own ability or trust in something",
+    "unit": 6,
+    "example": "Speak with confidence."
+  },
+  {
+    "id": 117,
+    "part_of_speech": "adj",
+    "original": "decent",
+    "translation_ru": "приличный",
+    "explanation_en": "acceptable or of a reasonable standard",
+    "unit": 6,
+    "example": "He has a decent job."
+  },
+  {
+    "id": 118,
+    "part_of_speech": "adj",
+    "original": "disposable",
+    "translation_ru": "одноразовый",
+    "explanation_en": "designed to be used once and then thrown away",
+    "unit": 6,
+    "example": "Use a disposable cup."
+  },
+  {
+    "id": 119,
+    "part_of_speech": "v",
+    "original": "expand",
+    "translation_ru": "расширять",
+    "explanation_en": "to increase in size, amount, or importance",
+    "unit": 6,
+    "example": "The business expanded."
+  },
+  {
+    "id": 120,
+    "part_of_speech": "n",
+    "original": "fairness",
+    "translation_ru": "справедливость",
+    "explanation_en": "the quality of treating people equally and justly",
+    "unit": 6,
+    "example": "We value fairness."
+  },
+  {
+    "id": 121,
+    "part_of_speech": "adj",
+    "original": "fierce",
+    "translation_ru": "свирепый",
+    "explanation_en": "very strong, intense, or aggressive",
+    "unit": 6,
+    "example": "There was fierce competition."
+  },
+  {
+    "id": 122,
+    "part_of_speech": "n",
+    "original": "genius",
+    "translation_ru": "гений",
+    "explanation_en": "a person with exceptional intelligence or creativity",
+    "unit": 6,
+    "example": "Einstein was a genius."
+  },
+  {
+    "id": 123,
+    "part_of_speech": "idm",
+    "original": "in particular",
+    "translation_ru": "в частности",
+    "explanation_en": "especially; more than others",
+    "unit": 6,
+    "example": "I liked the last chapter in particular."
+  },
+  {
+    "id": 124,
+    "part_of_speech": "n",
+    "original": "investor",
+    "translation_ru": "инвестор",
+    "explanation_en": "a person who puts money into a business to make a profit",
+    "unit": 6,
+    "example": "The investor funded the startup."
+  },
+  {
+    "id": 125,
+    "part_of_speech": "v",
+    "original": "launch",
+    "translation_ru": "запускать",
+    "explanation_en": "to start or introduce something new",
+    "unit": 6,
+    "example": "They will launch a new product."
+  },
+  {
+    "id": 126,
+    "part_of_speech": "adj",
+    "original": "massive",
+    "translation_ru": "массивный",
+    "explanation_en": "extremely large or heavy",
+    "unit": 6,
+    "example": "A massive ship passed by."
+  },
+  {
+    "id": 127,
+    "part_of_speech": "adj",
+    "original": "meaningful",
+    "translation_ru": "значимый",
+    "explanation_en": "having purpose or importance",
+    "unit": 6,
+    "example": "I want a meaningful relationship."
+  },
+  {
+    "id": 128,
+    "part_of_speech": "adj",
+    "original": "miserable",
+    "translation_ru": "несчастный",
+    "explanation_en": "very unhappy or uncomfortable",
+    "unit": 6,
+    "example": "He felt miserable."
+  },
+  {
+    "id": 129,
+    "part_of_speech": "n",
+    "original": "predecessor",
+    "translation_ru": "предшественник",
+    "explanation_en": "a person or thing that came before another",
+    "unit": 6,
+    "example": "My predecessor left notes."
+  },
+  {
+    "id": 130,
+    "part_of_speech": "n",
+    "original": "pressure",
+    "translation_ru": "давление",
+    "explanation_en": "stress or force caused by demands or difficulties",
+    "unit": 6,
+    "example": "He is under a lot of pressure."
+  },
+  {
+    "id": 131,
+    "part_of_speech": "n",
+    "original": "profit",
+    "translation_ru": "прибыль",
+    "explanation_en": "money gained after costs are subtracted",
+    "unit": 6,
+    "example": "The company made a profit."
+  },
+  {
+    "id": 132,
+    "part_of_speech": "n",
+    "original": "rate",
+    "translation_ru": "ставка, темп",
+    "explanation_en": "a measure, level, or speed of something",
+    "unit": 6,
+    "example": "The crime rate is low."
+  },
+  {
+    "id": 133,
+    "part_of_speech": "adv",
+    "original": "steadily",
+    "translation_ru": "неуклонно",
+    "explanation_en": "in a regular and consistent way",
+    "unit": 6,
+    "example": "Prices are rising steadily."
+  },
+  {
+    "id": 134,
+    "part_of_speech": "n",
+    "original": "values",
+    "translation_ru": "ценности",
+    "explanation_en": "beliefs about what is important or right",
+    "unit": 6,
+    "example": "Family values are important."
+  },
+  {
+    "id": 135,
+    "part_of_speech": "n",
+    "original": "vision",
+    "translation_ru": "видение",
+    "explanation_en": "an idea or plan for the future",
+    "unit": 6,
+    "example": "He has a clear vision."
+  },
+  {
+    "id": 136,
+    "part_of_speech": "n",
+    "original": "workforce",
+    "translation_ru": "рабочая сила",
+    "explanation_en": "all the people working in a company or country",
+    "unit": 6,
+    "example": "The workforce is skilled."
+  },
+  {
+    "id": 137,
+    "part_of_speech": "v",
+    "original": "ache",
+    "translation_ru": "болеть, ныть",
+    "explanation_en": "to feel a continuous dull pain",
+    "unit": 7,
+    "example": "My back aches."
+  },
+  {
+    "id": 138,
+    "part_of_speech": "n",
+    "original": "adhesive",
+    "translation_ru": "клей",
+    "explanation_en": "a substance used to stick things together",
+    "unit": 7,
+    "example": "Use adhesive to fix it."
+  },
+  {
+    "id": 139,
+    "part_of_speech": "v",
+    "original": "adopt",
+    "translation_ru": "принимать, усыновлять",
+    "explanation_en": "to take and use an idea, method, or policy",
+    "unit": 7,
+    "example": "We adopted a new strategy."
+  },
+  {
+    "id": 140,
+    "part_of_speech": "adj",
+    "original": "alert",
+    "translation_ru": "бдительный",
+    "explanation_en": "aware and quick to notice things",
+    "unit": 7,
+    "example": "Stay alert while driving."
+  },
+  {
+    "id": 141,
+    "part_of_speech": "adj",
+    "original": "biological",
+    "translation_ru": "биологический",
+    "explanation_en": "related to living organisms or life processes",
+    "unit": 7,
+    "example": "Biological father."
+  },
+  {
+    "id": 142,
+    "part_of_speech": "adj",
+    "original": "deprived",
+    "translation_ru": "лишенный",
+    "explanation_en": "lacking basic necessities or advantages",
+    "unit": 7,
+    "example": "He grew up in a deprived area."
+  },
+  {
+    "id": 143,
+    "part_of_speech": "v",
+    "original": "exploit",
+    "translation_ru": "эксплуатировать",
+    "explanation_en": "to use something fully, often unfairly or unethically",
+    "unit": 7,
+    "example": "They exploit workers."
+  },
+  {
+    "id": 144,
+    "part_of_speech": "adv. phr",
+    "original": "face to face",
+    "translation_ru": "лично, лицом к лицу",
+    "explanation_en": "directly, in person",
+    "unit": 7,
+    "example": "We met face to face."
+  },
+  {
+    "id": 145,
+    "part_of_speech": "adj",
+    "original": "flammable",
+    "translation_ru": "легковоспламеняющийся",
+    "explanation_en": "easily set on fire",
+    "unit": 7,
+    "example": "Gasoline is flammable."
+  },
+  {
+    "id": 146,
+    "part_of_speech": "adj",
+    "original": "inadvertent",
+    "translation_ru": "непреднамеренный",
+    "explanation_en": "not intentional; accidental",
+    "unit": 7,
+    "example": "It was an inadvertent error."
+  },
+  {
+    "id": 147,
+    "part_of_speech": "adv. phr",
+    "original": "in all probability",
+    "translation_ru": "по всей вероятности",
+    "explanation_en": "very likely; almost certainly",
+    "unit": 7,
+    "example": "In all probability, he will win."
+  },
+  {
+    "id": 148,
+    "part_of_speech": "adj",
+    "original": "inconceivable",
+    "translation_ru": "непостижимый",
+    "explanation_en": "impossible to imagine or believe",
+    "unit": 7,
+    "example": "It's inconceivable that he lied."
+  },
+  {
+    "id": 149,
+    "part_of_speech": "v",
+    "original": "interact",
+    "translation_ru": "взаимодействовать",
+    "explanation_en": "to communicate or work together",
+    "unit": 7,
+    "example": "Teachers interact with students."
+  },
+  {
+    "id": 150,
+    "part_of_speech": "adj",
+    "original": "mandatory",
+    "translation_ru": "обязательный",
+    "explanation_en": "required by law or rules",
+    "unit": 7,
+    "example": "Attendance is mandatory."
+  },
+  {
+    "id": 151,
+    "part_of_speech": "adj",
+    "original": "obvious",
+    "translation_ru": "очевидный",
+    "explanation_en": "easy to see or understand",
+    "unit": 7,
+    "example": "The answer is obvious."
+  },
+  {
+    "id": 152,
+    "part_of_speech": "n",
+    "original": "odds",
+    "translation_ru": "шансы",
+    "explanation_en": "the chances or likelihood of something happening",
+    "unit": 7,
+    "example": "The odds are against us."
+  },
+  {
+    "id": 153,
+    "part_of_speech": "n",
+    "original": "reunion",
+    "translation_ru": "воссоединение",
+    "explanation_en": "a meeting of people who have been apart",
+    "unit": 7,
+    "example": "We had a family reunion."
+  },
+  {
+    "id": 154,
+    "part_of_speech": "adj",
+    "original": "synthetic",
+    "translation_ru": "синтетический",
+    "explanation_en": "made by chemical processes rather than natural",
+    "unit": 7,
+    "example": "This fabric is synthetic."
+  },
+  {
+    "id": 155,
+    "part_of_speech": "adj",
+    "original": "unreliable",
+    "translation_ru": "ненадежный",
+    "explanation_en": "not able to be trusted or depended on",
+    "unit": 7,
+    "example": "This data is unreliable."
+  },
+  {
+    "id": 156,
+    "part_of_speech": "adv",
+    "original": "vastly",
+    "translation_ru": "значительно",
+    "explanation_en": "to a very great extent",
+    "unit": 7,
+    "example": "The new version is vastly improved."
+  },
+  {
+    "id": 157,
+    "part_of_speech": "adj",
+    "original": "abstract",
+    "translation_ru": "абстрактный",
+    "explanation_en": "existing as an idea rather than a concrete object",
+    "unit": 8,
+    "example": "Love is an abstract concept."
+  },
+  {
+    "id": 158,
+    "part_of_speech": "v. phr",
+    "original": "cater to",
+    "translation_ru": "угождать, обслуживать",
+    "explanation_en": "to provide what is wanted or needed by someone",
+    "unit": 8,
+    "example": "The hotel caters to families."
+  },
+  {
+    "id": 159,
+    "part_of_speech": "n",
+    "original": "dependency",
+    "translation_ru": "зависимость",
+    "explanation_en": "the state of relying on someone or something",
+    "unit": 8,
+    "example": "Drug dependency is dangerous."
+  },
+  {
+    "id": 160,
+    "part_of_speech": "v. phr",
+    "original": "dive into",
+    "translation_ru": "окунуться (в занятие)",
+    "explanation_en": "to start doing something enthusiastically",
+    "unit": 8,
+    "example": "She dove into her new job."
+  },
+  {
+    "id": 161,
+    "part_of_speech": "n",
+    "original": "diversity",
+    "translation_ru": "разнообразие",
+    "explanation_en": "the presence of differences within a group",
+    "unit": 8,
+    "example": "We value diversity."
+  },
+  {
+    "id": 162,
+    "part_of_speech": "n",
+    "original": "engagement",
+    "translation_ru": "вовлеченность",
+    "explanation_en": "involvement, participation, or commitment",
+    "unit": 8,
+    "example": "Employee engagement is high."
+  },
+  {
+    "id": 163,
+    "part_of_speech": "adv",
+    "original": "entirely",
+    "translation_ru": "полностью",
+    "explanation_en": "completely; totally",
+    "unit": 8,
+    "example": "I entirely agree."
+  },
+  {
+    "id": 164,
+    "part_of_speech": "adj",
+    "original": "fulfilled",
+    "translation_ru": "удовлетворенный",
+    "explanation_en": "satisfied because goals or desires have been achieved",
+    "unit": 8,
+    "example": "I feel fulfilled in my work."
+  },
+  {
+    "id": 165,
+    "part_of_speech": "adj",
+    "original": "generic",
+    "translation_ru": "общий, непатентованный",
+    "explanation_en": "general; not specific or branded",
+    "unit": 8,
+    "example": "Buy the generic brand."
+  },
+  {
+    "id": 166,
+    "part_of_speech": "n",
+    "original": "gut",
+    "translation_ru": "кишечник, чутье",
+    "explanation_en": "the stomach or digestive system; intuition",
+    "unit": 8,
+    "example": "I have a gut feeling."
+  },
+  {
+    "id": 167,
+    "part_of_speech": "n",
+    "original": "harm",
+    "translation_ru": "вред",
+    "explanation_en": "physical or mental damage or injury",
+    "unit": 8,
+    "example": "It caused no harm."
+  },
+  {
+    "id": 168,
+    "part_of_speech": "adj",
+    "original": "idle",
+    "translation_ru": "бездействующий",
+    "explanation_en": "not active or being used",
+    "unit": 8,
+    "example": "The machine is idle."
+  },
+  {
+    "id": 169,
+    "part_of_speech": "adj",
+    "original": "intimate",
+    "translation_ru": "близкий, интимный",
+    "explanation_en": "close and personal; private",
+    "unit": 8,
+    "example": "We had an intimate conversation."
+  },
+  {
+    "id": 170,
+    "part_of_speech": "adv",
+    "original": "loosely",
+    "translation_ru": "свободно",
+    "explanation_en": "not firmly or strictly",
+    "unit": 8,
+    "example": "The term is used loosely."
+  },
+  {
+    "id": 171,
+    "part_of_speech": "adj",
+    "original": "manual",
+    "translation_ru": "ручной",
+    "explanation_en": "done by hand or involving physical effort",
+    "unit": 8,
+    "example": "This is manual labor."
+  },
+  {
+    "id": 172,
+    "part_of_speech": "adv",
+    "original": "necessarily",
+    "translation_ru": "обязательно",
+    "explanation_en": "as a required or unavoidable result",
+    "unit": 8,
+    "example": "It is not necessarily true."
+  },
+  {
+    "id": 173,
+    "part_of_speech": "n",
+    "original": "notion",
+    "translation_ru": "понятие",
+    "explanation_en": "an idea or belief",
+    "unit": 8,
+    "example": "I have no notion of what you mean."
+  },
+  {
+    "id": 174,
+    "part_of_speech": "n",
+    "original": "outcome",
+    "translation_ru": "исход",
+    "explanation_en": "the result or effect of an action or event",
+    "unit": 8,
+    "example": "We are waiting for the outcome."
+  },
+  {
+    "id": 175,
+    "part_of_speech": "adj",
+    "original": "philosophical",
+    "translation_ru": "философский",
+    "explanation_en": "relating to philosophy or deep thinking",
+    "unit": 8,
+    "example": "He took a philosophical approach."
+  },
+  {
+    "id": 176,
+    "part_of_speech": "adj",
+    "original": "prospective",
+    "translation_ru": "будущий, потенциальный",
+    "explanation_en": "expected or likely in the future",
+    "unit": 8,
+    "example": "Meet the prospective buyers."
+  },
+  {
+    "id": 177,
+    "part_of_speech": "adj",
+    "original": "subtle",
+    "translation_ru": "тонкий, неявный",
+    "explanation_en": "delicate or not obvious",
+    "unit": 8,
+    "example": "There was a subtle difference."
+  },
+  {
+    "id": 178,
+    "part_of_speech": "adv",
+    "original": "theoretically",
+    "translation_ru": "теоретически",
+    "explanation_en": "according to theory rather than practice",
+    "unit": 8,
+    "example": "Theoretically, it works."
+  },
+  {
+    "id": 179,
+    "part_of_speech": "n",
+    "original": "uniformity",
+    "translation_ru": "единообразие",
+    "explanation_en": "the quality of being consistent or the same throughout",
+    "unit": 8,
+    "example": "Uniformity is required."
+  },
+  {
+    "id": 180,
+    "part_of_speech": "n",
+    "original": "achievement",
+    "translation_ru": "достижение",
+    "explanation_en": "something successfully completed, especially with effort",
+    "unit": 1,
+    "example": "Winning the award was a great achievement."
+  },
+  {
+    "id": 181,
+    "part_of_speech": "adj",
+    "original": "acknowledged for",
+    "translation_ru": "признанный за",
+    "explanation_en": "recognized or praised for a specific achievement or quality",
+    "unit": 1,
+    "example": "She was acknowledged for her bravery."
+  },
+  {
+    "id": 182,
+    "part_of_speech": "n",
+    "original": "adversity",
+    "translation_ru": "невзгода",
+    "explanation_en": "difficulty or hardship",
+    "unit": 1,
+    "example": "He remained strong in adversity."
+  },
+  {
+    "id": 183,
+    "part_of_speech": "n/v",
+    "original": "advocate",
+    "translation_ru": "защитник / поддерживать",
+    "explanation_en": "a person who supports a cause / to support publicly",
+    "unit": 1,
+    "example": "She is an advocate for human rights."
+  },
+  {
+    "id": 184,
+    "part_of_speech": "v",
+    "original": "aspire to",
+    "translation_ru": "стремиться к",
+    "explanation_en": "to strongly want to achieve something",
+    "unit": 1,
+    "example": "He aspires to be a doctor."
+  },
+  {
+    "id": 185,
+    "part_of_speech": "n",
+    "original": "authenticity",
+    "translation_ru": "подлинность",
+    "explanation_en": "being real, genuine, and true original",
+    "unit": 1,
+    "example": "The authenticity of the painting was confirmed."
+  },
+  {
+    "id": 186,
+    "part_of_speech": "n",
+    "original": "cause",
+    "translation_ru": "причина, дело",
+    "explanation_en": "a reason something happens; a principle or movement",
+    "unit": 1,
+    "example": "They fought for a just cause."
+  },
+  {
+    "id": 187,
+    "part_of_speech": "v",
+    "original": "confront",
+    "translation_ru": "сталкиваться",
+    "explanation_en": "to face a difficult situation directly",
+    "unit": 1,
+    "example": "You must confront your fears."
+  },
+  {
+    "id": 188,
+    "part_of_speech": "adj",
+    "original": "constrained",
+    "translation_ru": "ограниченный",
+    "explanation_en": "limited or restricted",
+    "unit": 1,
+    "example": "We are constrained by time."
+  },
+  {
+    "id": 189,
+    "part_of_speech": "adj",
+    "original": "diverse",
+    "translation_ru": "разнообразный",
+    "explanation_en": "showing variety or differences",
+    "unit": 1,
+    "example": "The city is culturally diverse."
+  },
+  {
+    "id": 190,
+    "part_of_speech": "v",
+    "original": "embody",
+    "translation_ru": "воплощать",
+    "explanation_en": "to represent or show clearly",
+    "unit": 1,
+    "example": "She embodies the spirit of the team."
+  },
+  {
+    "id": 191,
+    "part_of_speech": "v",
+    "original": "empower",
+    "translation_ru": "давать возможность",
+    "explanation_en": "to give power, confidence, or ability",
+    "unit": 1,
+    "example": "Education empowers people."
+  },
+  {
+    "id": 192,
+    "part_of_speech": "adj",
+    "original": "exponential",
+    "translation_ru": "экспоненциальный",
+    "explanation_en": "increasing very rapidly",
+    "unit": 1,
+    "example": "The growth was exponential."
+  },
+  {
+    "id": 193,
+    "part_of_speech": "n",
+    "original": "funding",
+    "translation_ru": "финансирование",
+    "explanation_en": "money provided for a purpose",
+    "unit": 1,
+    "example": "The project needs funding."
+  },
+  {
+    "id": 194,
+    "part_of_speech": "n/adj",
+    "original": "humanitarian",
+    "translation_ru": "гуманист, гуманитарный",
+    "explanation_en": "a person concerned with human welfare",
+    "unit": 1,
+    "example": "She worked for humanitarian aid."
+  },
+  {
+    "id": 195,
+    "part_of_speech": "n",
+    "original": "humility",
+    "translation_ru": "смирение",
+    "explanation_en": "modesty; not thinking you are better than others",
+    "unit": 1,
+    "example": "He accepted the prize with humility."
+  },
+  {
+    "id": 196,
+    "part_of_speech": "adj",
+    "original": "inclined",
+    "translation_ru": "склонный",
+    "explanation_en": "likely or willing to do something; having a tendency",
+    "unit": 1,
+    "example": "I am inclined to agree with you."
+  },
+  {
+    "id": 197,
+    "part_of_speech": "adv",
+    "original": "inherently",
+    "translation_ru": "по своей сути",
+    "explanation_en": "existing as a natural or essential part of something",
+    "unit": 1,
+    "example": "The system is not inherently bad."
+  },
+  {
+    "id": 198,
+    "part_of_speech": "v",
+    "original": "perceive",
+    "translation_ru": "воспринимать",
+    "explanation_en": "to understand or see something in a certain way",
+    "unit": 1,
+    "example": "How do you perceive the situation?"
+  },
+  {
+    "id": 199,
+    "part_of_speech": "v",
+    "original": "personify",
+    "translation_ru": "олицетворять",
+    "explanation_en": "to represent something as a person",
+    "unit": 1,
+    "example": "He personifies kindness."
+  },
+  {
+    "id": 200,
+    "part_of_speech": "n",
+    "original": "phenomenon",
+    "translation_ru": "феномен",
+    "explanation_en": "an observable event or fact",
+    "unit": 1,
+    "example": "Lightning is a natural phenomenon."
+  },
+  {
+    "id": 201,
+    "part_of_speech": "v",
+    "original": "pursue",
+    "translation_ru": "преследовать (цель)",
+    "explanation_en": "to try to achieve or follow something",
+    "unit": 1,
+    "example": "She wants to pursue a career in music."
+  },
+  {
+    "id": 202,
+    "part_of_speech": "v",
+    "original": "resolve",
+    "translation_ru": "решать (проблему)",
+    "explanation_en": "to find a solution to a problem",
+    "unit": 1,
+    "example": "We need to resolve this issue."
+  },
+  {
+    "id": 203,
+    "part_of_speech": "n",
+    "original": "version",
+    "translation_ru": "версия",
+    "explanation_en": "a particular form or variation of something",
+    "unit": 1,
+    "example": "I have the latest version."
+  },
+  {
+    "id": 204,
+    "part_of_speech": "n",
+    "original": "activation",
+    "translation_ru": "активация",
+    "explanation_en": "the process of starting or making something active",
+    "unit": 2,
+    "example": "Activation of the account is required."
+  },
+  {
+    "id": 205,
+    "part_of_speech": "v",
+    "original": "align",
+    "translation_ru": "выравнивать, согласовывать",
+    "explanation_en": "to arrange or adjust in a straight line or proper position; to agree",
+    "unit": 2,
+    "example": "Align the text to the left."
+  },
+  {
+    "id": 206,
+    "part_of_speech": "n",
+    "original": "allure",
+    "translation_ru": "привлекательность",
+    "explanation_en": "the quality of being powerfully attractive or fascinating",
+    "unit": 2,
+    "example": "The allure of the city was strong."
+  },
+  {
+    "id": 207,
+    "part_of_speech": "v",
+    "original": "assume",
+    "translation_ru": "предполагать",
+    "explanation_en": "to accept something as true without proof",
+    "unit": 2,
+    "example": "I assume you are coming."
+  },
+  {
+    "id": 208,
+    "part_of_speech": "adv. phr",
+    "original": "broadly speaking",
+    "translation_ru": "в общем смысле",
+    "explanation_en": "in general terms; without focusing on details",
+    "unit": 2,
+    "example": "Broadly speaking, it's a good plan."
+  },
+  {
+    "id": 209,
+    "part_of_speech": "v",
+    "original": "counter",
+    "translation_ru": "противостоять",
+    "explanation_en": "to act in opposition to; to respond to",
+    "unit": 2,
+    "example": "He countered the argument."
+  },
+  {
+    "id": 210,
+    "part_of_speech": "v",
+    "original": "crave",
+    "translation_ru": "сильно желать",
+    "explanation_en": "to have a strong desire for something",
+    "unit": 2,
+    "example": "I crave chocolate."
+  },
+  {
+    "id": 211,
+    "part_of_speech": "v",
+    "original": "disclose",
+    "translation_ru": "раскрывать",
+    "explanation_en": "to make information known or reveal",
+    "unit": 2,
+    "example": "Please disclose all facts."
+  },
+  {
+    "id": 212,
+    "part_of_speech": "adj",
+    "original": "distinct",
+    "translation_ru": "отчетливый, различный",
+    "explanation_en": "clearly different or separate",
+    "unit": 2,
+    "example": "There are two distinct types."
+  },
+  {
+    "id": 213,
+    "part_of_speech": "v",
+    "original": "endorse",
+    "translation_ru": "поддерживать",
+    "explanation_en": "to support, approve, or recommend",
+    "unit": 2,
+    "example": "The senator endorsed the bill."
+  },
+  {
+    "id": 214,
+    "part_of_speech": "v",
+    "original": "escalate",
+    "translation_ru": "обостряться",
+    "explanation_en": "to increase or intensify",
+    "unit": 2,
+    "example": "The conflict escalated."
+  },
+  {
+    "id": 215,
+    "part_of_speech": "adv",
+    "original": "essentially",
+    "translation_ru": "по сути",
+    "explanation_en": "fundamentally; basically",
+    "unit": 2,
+    "example": "It is essentially the same."
+  },
+  {
+    "id": 216,
+    "part_of_speech": "adj",
+    "original": "exaggerated",
+    "translation_ru": "преувеличенный",
+    "explanation_en": "made to seem larger, better, or worse than it really is",
+    "unit": 2,
+    "example": "His story was exaggerated."
+  },
+  {
+    "id": 217,
+    "part_of_speech": "adj",
+    "original": "functional",
+    "translation_ru": "функциональный",
+    "explanation_en": "designed to be practical and useful, working",
+    "unit": 2,
+    "example": "The furniture is simple and functional."
+  },
+  {
+    "id": 218,
+    "part_of_speech": "adj",
+    "original": "impulsive",
+    "translation_ru": "импульсивный",
+    "explanation_en": "acting without thought or planning; spontaneous",
+    "unit": 2,
+    "example": "He made an impulsive decision."
+  },
+  {
+    "id": 219,
+    "part_of_speech": "n",
+    "original": "insight",
+    "translation_ru": "понимание",
+    "explanation_en": "a deep understanding of a person or situation",
+    "unit": 2,
+    "example": "The book gives insight into his mind."
+  },
+  {
+    "id": 220,
+    "part_of_speech": "v",
+    "original": "manipulate",
+    "translation_ru": "манипулировать",
+    "explanation_en": "to handle, control, or influence cleverly or unfairly",
+    "unit": 2,
+    "example": "He tried to manipulate the data."
+  },
+  {
+    "id": 221,
+    "part_of_speech": "n",
+    "original": "metric",
+    "translation_ru": "показатель",
+    "explanation_en": "a standard of measurement or assessment",
+    "unit": 2,
+    "example": "We track key metrics."
+  },
+  {
+    "id": 222,
+    "part_of_speech": "n",
+    "original": "obsession",
+    "translation_ru": "одержимость",
+    "explanation_en": "a persistent, disturbing preoccupation with an idea or feeling",
+    "unit": 2,
+    "example": "His obsession with cleanliness."
+  },
+  {
+    "id": 223,
+    "part_of_speech": "v. phr",
+    "original": "put a premium on",
+    "translation_ru": "высоко ценить",
+    "explanation_en": "to give special importance or value to something",
+    "unit": 2,
+    "example": "This school puts a premium on creativity."
+  },
+  {
+    "id": 224,
+    "part_of_speech": "n",
+    "original": "resistance",
+    "translation_ru": "сопротивление",
+    "explanation_en": "the act of opposing or withstanding",
+    "unit": 2,
+    "example": "There was strong resistance."
+  },
+  {
+    "id": 225,
+    "part_of_speech": "n",
+    "original": "tactic",
+    "translation_ru": "тактика",
+    "explanation_en": "a planned action or strategy to achieve a goal",
+    "unit": 2,
+    "example": "That's an aggressive tactic."
+  },
+  {
+    "id": 226,
+    "part_of_speech": "adj",
+    "original": "tolerant",
+    "translation_ru": "терпимый",
+    "explanation_en": "willing to accept differences or opinions of others",
+    "unit": 2,
+    "example": "We need to be tolerant."
+  },
+  {
+    "id": 227,
+    "part_of_speech": "n",
+    "original": "transparency",
+    "translation_ru": "прозрачность",
+    "explanation_en": "the quality of being clear, open, and honest",
+    "unit": 2,
+    "example": "Transparency is important in government."
+  },
+  {
+    "id": 228,
+    "part_of_speech": "n",
+    "original": "anxiety",
+    "translation_ru": "тревога",
+    "explanation_en": "a feeling of worry, nervousness, or unease about something uncertain",
+    "unit": 3,
+    "example": "He suffers from anxiety."
+  },
+  {
+    "id": 229,
+    "part_of_speech": "v",
+    "original": "attribute",
+    "translation_ru": "приписывать",
+    "explanation_en": "to regard something as being caused by someone or something",
+    "unit": 3,
+    "example": "She attributes her success to hard work."
+  },
+  {
+    "id": 230,
+    "part_of_speech": "n",
+    "original": "barrier",
+    "translation_ru": "барьер",
+    "explanation_en": "something that blocks or makes progress difficult",
+    "unit": 3,
+    "example": "The language barrier was hard."
+  },
+  {
+    "id": 231,
+    "part_of_speech": "n",
+    "original": "coping",
+    "translation_ru": "преодоление",
+    "explanation_en": "the way a person deals with difficult or stressful situations",
+    "unit": 3,
+    "example": "Coping skills are essential."
+  },
+  {
+    "id": 232,
+    "part_of_speech": "n",
+    "original": "courage",
+    "translation_ru": "мужество",
+    "explanation_en": "the ability to face fear, danger, or difficulty",
+    "unit": 3,
+    "example": "She showed great courage."
+  },
+  {
+    "id": 233,
+    "part_of_speech": "n",
+    "original": "empathy",
+    "translation_ru": "эмпатия",
+    "explanation_en": "the ability to understand and share another person's feelings",
+    "unit": 3,
+    "example": "A doctor needs empathy."
+  },
+  {
+    "id": 234,
+    "part_of_speech": "v",
+    "original": "encounter",
+    "translation_ru": "встречать, сталкиваться",
+    "explanation_en": "to meet or experience something, often unexpectedly",
+    "unit": 3,
+    "example": "I encountered an old friend."
+  },
+  {
+    "id": 235,
+    "part_of_speech": "adj",
+    "original": "extensive",
+    "translation_ru": "обширный",
+    "explanation_en": "covering a large area or involving a great amount",
+    "unit": 3,
+    "example": "He has extensive experience."
+  },
+  {
+    "id": 236,
+    "part_of_speech": "v. phr",
+    "original": "fit in",
+    "translation_ru": "вписаться",
+    "explanation_en": "to feel accepted or belong in a group",
+    "unit": 3,
+    "example": "He struggled to fit in."
+  },
+  {
+    "id": 237,
+    "part_of_speech": "n",
+    "original": "foundation",
+    "translation_ru": "основа",
+    "explanation_en": "a basic principle or idea that something is built on",
+    "unit": 3,
+    "example": "Trust is the foundation of a relationship."
+  },
+  {
+    "id": 238,
+    "part_of_speech": "n",
+    "original": "hesitation",
+    "translation_ru": "колебание",
+    "explanation_en": "a pause or delay due to uncertainty or doubt",
+    "unit": 3,
+    "example": "He agreed without hesitation."
+  },
+  {
+    "id": 239,
+    "part_of_speech": "n",
+    "original": "interaction",
+    "translation_ru": "взаимодействие",
+    "explanation_en": "communication or action between people or things",
+    "unit": 3,
+    "example": "Social interaction is important."
+  },
+  {
+    "id": 240,
+    "part_of_speech": "n",
+    "original": "intervention",
+    "translation_ru": "вмешательство",
+    "explanation_en": "the act of becoming involved to improve a situation",
+    "unit": 3,
+    "example": "The teacher's intervention helped."
+  },
+  {
+    "id": 241,
+    "part_of_speech": "v",
+    "original": "negotiate",
+    "translation_ru": "вести переговоры",
+    "explanation_en": "to discuss in order to reach an agreement",
+    "unit": 3,
+    "example": "We need to negotiate a deal."
+  },
+  {
+    "id": 242,
+    "part_of_speech": "adj",
+    "original": "petrified",
+    "translation_ru": "окаменевший (от страха)",
+    "explanation_en": "extremely frightened",
+    "unit": 3,
+    "example": "I was petrified of the dark."
+  },
+  {
+    "id": 243,
+    "part_of_speech": "v. phr",
+    "original": "pitch in",
+    "translation_ru": "вносить вклад",
+    "explanation_en": "to help or contribute effort",
+    "unit": 3,
+    "example": "Everyone pitched in to clean."
+  },
+  {
+    "id": 244,
+    "part_of_speech": "n",
+    "original": "refrain",
+    "translation_ru": "припев",
+    "explanation_en": "a repeated line or phrase, especially in music or speech",
+    "unit": 3,
+    "example": "The refrain was catchy."
+  },
+  {
+    "id": 245,
+    "part_of_speech": "n",
+    "original": "self-fulfillment",
+    "translation_ru": "самореализация",
+    "explanation_en": "the realization of one's abilities and potential",
+    "unit": 3,
+    "example": "He seeks self-fulfillment."
+  },
+  {
+    "id": 246,
+    "part_of_speech": "n",
+    "original": "shame",
+    "translation_ru": "стыд",
+    "explanation_en": "a feeling of guilt, embarrassment, or dishonor",
+    "unit": 3,
+    "example": "He felt deep shame."
+  },
+  {
+    "id": 247,
+    "part_of_speech": "adj",
+    "original": "tragic",
+    "translation_ru": "трагический",
+    "explanation_en": "involving great sadness or suffering",
+    "unit": 3,
+    "example": "It was a tragic accident."
+  },
+  {
+    "id": 248,
+    "part_of_speech": "n",
+    "original": "void",
+    "translation_ru": "пустота",
+    "explanation_en": "an empty space or feeling of emptiness",
+    "unit": 3,
+    "example": "Her death left a void."
+  },
+  {
+    "id": 249,
+    "part_of_speech": "n. phr",
+    "original": "work ethic",
+    "translation_ru": "трудовая этика",
+    "explanation_en": "a belief in the importance of hard work",
+    "unit": 3,
+    "example": "She has a strong work ethic."
+  },
+  {
+    "id": 250,
+    "part_of_speech": "adj",
+    "original": "wounded",
+    "translation_ru": "раненый",
+    "explanation_en": "physically or emotionally injured",
+    "unit": 3,
+    "example": "The wounded soldier was helped."
+  },
+  {
+    "id": 251,
+    "part_of_speech": "v",
+    "original": "absorb",
+    "translation_ru": "впитывать",
+    "explanation_en": "to take in or soak up something, such as liquid, information, or energy",
+    "unit": 4,
+    "example": "Sponges absorb water."
+  },
+  {
+    "id": 252,
+    "part_of_speech": "v",
+    "original": "alleviate",
+    "translation_ru": "облегчать",
+    "explanation_en": "to make pain, suffering, or a problem less severe",
+    "unit": 4,
+    "example": "This medicine alleviates pain."
+  },
+  {
+    "id": 253,
+    "part_of_speech": "v",
+    "original": "caution",
+    "translation_ru": "предостерегать",
+    "explanation_en": "to warn someone to be careful",
+    "unit": 4,
+    "example": "I must caution you about the risks."
+  },
+  {
+    "id": 254,
+    "part_of_speech": "adj",
+    "original": "dedicated",
+    "translation_ru": "посвященный (делу)",
+    "explanation_en": "committed to a task or purpose with strong effort",
+    "unit": 4,
+    "example": "She is a dedicated teacher."
+  },
+  {
+    "id": 255,
+    "part_of_speech": "adj",
+    "original": "developing",
+    "translation_ru": "развивающийся",
+    "explanation_en": "growing, changing, or becoming more advanced",
+    "unit": 4,
+    "example": "It's a developing country."
+  },
+  {
+    "id": 256,
+    "part_of_speech": "n",
+    "original": "drought",
+    "translation_ru": "засуха",
+    "explanation_en": "a long period of time with little or no rain",
+    "unit": 4,
+    "example": "The drought killed the crops."
+  },
+  {
+    "id": 257,
+    "part_of_speech": "n",
+    "original": "enterprise",
+    "translation_ru": "предприятие",
+    "explanation_en": "a project, business, or organization involving initiative",
+    "unit": 4,
+    "example": "He runs a small enterprise."
+  },
+  {
+    "id": 258,
+    "part_of_speech": "n",
+    "original": "existence",
+    "translation_ru": "существование",
+    "explanation_en": "the state of being real or alive",
+    "unit": 4,
+    "example": "Do you believe in the existence of aliens?"
+  },
+  {
+    "id": 259,
+    "part_of_speech": "v",
+    "original": "extract",
+    "translation_ru": "извлекать",
+    "explanation_en": "to remove or take something out, especially with effort",
+    "unit": 4,
+    "example": "They extract oil from the ground."
+  },
+  {
+    "id": 260,
+    "part_of_speech": "n",
+    "original": "framework",
+    "translation_ru": "структура",
+    "explanation_en": "a basic structure or system supporting something",
+    "unit": 4,
+    "example": "We need a legal framework."
+  },
+  {
+    "id": 261,
+    "part_of_speech": "v",
+    "original": "generate",
+    "translation_ru": "генерировать",
+    "explanation_en": "to produce or create something",
+    "unit": 4,
+    "example": "This turbine generates electricity."
+  },
+  {
+    "id": 262,
+    "part_of_speech": "n",
+    "original": "grid",
+    "translation_ru": "сетка",
+    "explanation_en": "a network of lines or a system used for organization or distribution",
+    "unit": 4,
+    "example": "The power grid failed."
+  },
+  {
+    "id": 263,
+    "part_of_speech": "n",
+    "original": "implication",
+    "translation_ru": "последствие, намек",
+    "explanation_en": "a possible effect or meaning that is suggested but not stated directly",
+    "unit": 4,
+    "example": "The financial implications are serious."
+  },
+  {
+    "id": 264,
+    "part_of_speech": "adj",
+    "original": "innovative",
+    "translation_ru": "инновационный",
+    "explanation_en": "introducing new ideas, methods, or products",
+    "unit": 4,
+    "example": "It's an innovative design."
+  },
+  {
+    "id": 265,
+    "part_of_speech": "adv",
+    "original": "intuitively",
+    "translation_ru": "интуитивно",
+    "explanation_en": "based on instinct or understanding without conscious reasoning",
+    "unit": 4,
+    "example": "She knew intuitively that something was wrong."
+  },
+  {
+    "id": 266,
+    "part_of_speech": "n",
+    "original": "motion",
+    "translation_ru": "движение",
+    "explanation_en": "the act or process of moving",
+    "unit": 4,
+    "example": "The train was in motion."
+  },
+  {
+    "id": 267,
+    "part_of_speech": "adj",
+    "original": "organic",
+    "translation_ru": "органический",
+    "explanation_en": "natural or related to living things; not artificial",
+    "unit": 4,
+    "example": "He eats organic food."
+  },
+  {
+    "id": 268,
+    "part_of_speech": "adj",
+    "original": "porous",
+    "translation_ru": "пористый",
+    "explanation_en": "having small holes that allow air or liquid to pass through",
+    "unit": 4,
+    "example": "The material is porous."
+  },
+  {
+    "id": 269,
+    "part_of_speech": "adv",
+    "original": "potentially",
+    "translation_ru": "потенциально",
+    "explanation_en": "possibly; capable of happening in the future",
+    "unit": 4,
+    "example": "It could potentially be dangerous."
+  },
+  {
+    "id": 270,
+    "part_of_speech": "n",
+    "original": "premise",
+    "translation_ru": "предпосылка",
+    "explanation_en": "a statement or idea on which reasoning is based",
+    "unit": 4,
+    "example": "The premise of the argument is flawed."
+  },
+  {
+    "id": 271,
+    "part_of_speech": "n",
+    "original": "replacement",
+    "translation_ru": "замена",
+    "explanation_en": "the act of substituting one thing for another",
+    "unit": 4,
+    "example": "I need a replacement for the broken part."
+  },
+  {
+    "id": 272,
+    "part_of_speech": "v",
+    "original": "resemble",
+    "translation_ru": "напоминать",
+    "explanation_en": "to look like or be similar to",
+    "unit": 4,
+    "example": "You resemble your mother."
+  },
+  {
+    "id": 273,
+    "part_of_speech": "n",
+    "original": "shortage",
+    "translation_ru": "нехватка",
+    "explanation_en": "a lack or insufficient supply of something",
+    "unit": 4,
+    "example": "There is a water shortage."
+  },
+  {
+    "id": 274,
+    "part_of_speech": "n",
+    "original": "yield",
+    "translation_ru": "урожай, доход, результат",
+    "explanation_en": "the amount produced or the result obtained",
+    "unit": 4,
+    "example": "The crop yield was high."
+  },
+  {
+    "id": 275,
+    "part_of_speech": "n",
+    "original": "access",
+    "translation_ru": "доступ",
+    "explanation_en": "the ability or right to enter, use, or obtain something",
+    "unit": 5,
+    "example": "Do you have internet access?"
+  },
+  {
+    "id": 276,
+    "part_of_speech": "n",
+    "original": "approach",
+    "translation_ru": "подход",
+    "explanation_en": "a way of dealing with a situation or problem",
+    "unit": 5,
+    "example": "We need a new approach."
+  },
+  {
+    "id": 277,
+    "part_of_speech": "n",
+    "original": "benefit",
+    "translation_ru": "выгода",
+    "explanation_en": "an advantage or positive result",
+    "unit": 5,
+    "example": "What are the benefits?"
+  },
+  {
+    "id": 278,
+    "part_of_speech": "n",
+    "original": "beverage",
+    "translation_ru": "напиток",
+    "explanation_en": "a drink of any kind",
+    "unit": 5,
+    "example": "Hot beverages are served."
+  },
+  {
+    "id": 279,
+    "part_of_speech": "v",
+    "original": "challenge",
+    "translation_ru": "бросать вызов",
+    "explanation_en": "to test someone's ability or question something",
+    "unit": 5,
+    "example": "I challenge you to a race."
+  },
+  {
+    "id": 280,
+    "part_of_speech": "n",
+    "original": "complexity",
+    "translation_ru": "сложность",
+    "explanation_en": "the state of being complicated or difficult to understand",
+    "unit": 5,
+    "example": "The complexity of the issue."
+  },
+  {
+    "id": 281,
+    "part_of_speech": "v",
+    "original": "eliminate",
+    "translation_ru": "устранять",
+    "explanation_en": "to remove or get rid of something completely",
+    "unit": 5,
+    "example": "We eliminated errors."
+  },
+  {
+    "id": 282,
+    "part_of_speech": "v",
+    "original": "encourage",
+    "translation_ru": "поощрять",
+    "explanation_en": "to give support, confidence, or hope to someone",
+    "unit": 5,
+    "example": "My parents encourage me."
+  },
+  {
+    "id": 283,
+    "part_of_speech": "n",
+    "original": "expert",
+    "translation_ru": "эксперт",
+    "explanation_en": "a person with a high level of knowledge or skill",
+    "unit": 5,
+    "example": "He is an expert on history."
+  },
+  {
+    "id": 284,
+    "part_of_speech": "n",
+    "original": "finding",
+    "translation_ru": "результат (исследования)",
+    "explanation_en": "a result or conclusion discovered through research",
+    "unit": 5,
+    "example": "The findings were published."
+  },
+  {
+    "id": 285,
+    "part_of_speech": "v. phr",
+    "original": "follow through with",
+    "translation_ru": "доводить до конца",
+    "explanation_en": "to complete an action as planned",
+    "unit": 5,
+    "example": "You must follow through with your promise."
+  },
+  {
+    "id": 286,
+    "part_of_speech": "adj",
+    "original": "genetic",
+    "translation_ru": "генетический",
+    "explanation_en": "related to genes or heredity",
+    "unit": 5,
+    "example": "It's a genetic disorder."
+  },
+  {
+    "id": 287,
+    "part_of_speech": "v",
+    "original": "ingest",
+    "translation_ru": "проглатывать",
+    "explanation_en": "to take food, drink, or substances into the body",
+    "unit": 5,
+    "example": "Do not ingest this chemical."
+  },
+  {
+    "id": 288,
+    "part_of_speech": "adj",
+    "original": "initial",
+    "translation_ru": "начальный",
+    "explanation_en": "existing or occurring at the beginning",
+    "unit": 5,
+    "example": "My initial reaction was surprise."
+  },
+  {
+    "id": 289,
+    "part_of_speech": "n",
+    "original": "link",
+    "translation_ru": "связь",
+    "explanation_en": "a connection between two or more things",
+    "unit": 5,
+    "example": "Is there a link between the crimes?"
+  },
+  {
+    "id": 290,
+    "part_of_speech": "v",
+    "original": "metabolize",
+    "translation_ru": "метаболизировать",
+    "explanation_en": "to process substances in the body to produce energy",
+    "unit": 5,
+    "example": "How fast do you metabolize alcohol?"
+  },
+  {
+    "id": 291,
+    "part_of_speech": "v",
+    "original": "participate",
+    "translation_ru": "участвовать",
+    "explanation_en": "to take part in an activity",
+    "unit": 5,
+    "example": "Everyone should participate."
+  },
+  {
+    "id": 292,
+    "part_of_speech": "adj",
+    "original": "physical",
+    "translation_ru": "физический",
+    "explanation_en": "related to the body rather than the mind",
+    "unit": 5,
+    "example": "Physical exercise is good."
+  },
+  {
+    "id": 293,
+    "part_of_speech": "n",
+    "original": "physician",
+    "translation_ru": "врач",
+    "explanation_en": "a medical doctor",
+    "unit": 5,
+    "example": "Consult a physician."
+  },
+  {
+    "id": 294,
+    "part_of_speech": "adj",
+    "original": "practical",
+    "translation_ru": "практичный",
+    "explanation_en": "useful and suitable for real situations",
+    "unit": 5,
+    "example": "That's a practical solution."
+  },
+  {
+    "id": 295,
+    "part_of_speech": "adj",
+    "original": "promising",
+    "translation_ru": "многообещающий",
+    "explanation_en": "showing signs of success or potential",
+    "unit": 5,
+    "example": "He is a promising student."
+  },
+  {
+    "id": 296,
+    "part_of_speech": "n",
+    "original": "series",
+    "translation_ru": "серия",
+    "explanation_en": "a set of related things in order",
+    "unit": 5,
+    "example": "A series of events happened."
+  },
+  {
+    "id": 297,
+    "part_of_speech": "adv",
+    "original": "thus",
+    "translation_ru": "таким образом",
+    "explanation_en": "as a result; therefore",
+    "unit": 5,
+    "example": "He failed, thus losing his chance."
+  },
+  {
+    "id": 298,
+    "part_of_speech": "n",
+    "original": "variation",
+    "translation_ru": "вариация",
+    "explanation_en": "a difference or change in form or condition",
+    "unit": 5,
+    "example": "There are many variations."
+  },
+  {
+    "id": 299,
+    "part_of_speech": "v",
+    "original": "acquire",
+    "translation_ru": "приобретать",
+    "explanation_en": "to obtain or gain something, especially through effort or learning",
+    "unit": 6,
+    "example": "She acquired new skills."
+  },
+  {
+    "id": 300,
+    "part_of_speech": "v",
+    "original": "adjust",
+    "translation_ru": "настраивать",
+    "explanation_en": "to change something slightly to make it better or more suitable",
+    "unit": 6,
+    "example": "Adjust the settings."
+  },
+  {
+    "id": 301,
+    "part_of_speech": "adj",
+    "original": "ambiguous",
+    "translation_ru": "двусмысленный",
+    "explanation_en": "having more than one possible meaning; unclear",
+    "unit": 6,
+    "example": "His answer was ambiguous."
+  },
+  {
+    "id": 302,
+    "part_of_speech": "v",
+    "original": "analyze",
+    "translation_ru": "анализировать",
+    "explanation_en": "to examine something carefully in order to understand it",
+    "unit": 6,
+    "example": "Analyze the data."
+  },
+  {
+    "id": 303,
+    "part_of_speech": "v",
+    "original": "anticipate",
+    "translation_ru": "предвидеть",
+    "explanation_en": "to expect or predict something before it happens",
+    "unit": 6,
+    "example": "We anticipate problems."
+  },
+  {
+    "id": 304,
+    "part_of_speech": "v",
+    "original": "approach",
+    "translation_ru": "приближаться, подходить к вопросу",
+    "explanation_en": "to come near or deal with a situation in a certain way",
+    "unit": 6,
+    "example": "He approached the house slowly."
+  },
+  {
+    "id": 305,
+    "part_of_speech": "adj",
+    "original": "collaborative",
+    "translation_ru": "совместный",
+    "explanation_en": "involving people working together to achieve a goal",
+    "unit": 6,
+    "example": "It was a collaborative effort."
+  },
+  {
+    "id": 306,
+    "part_of_speech": "adj",
+    "original": "constant",
+    "translation_ru": "постоянный",
+    "explanation_en": "happening all the time; not changing",
+    "unit": 6,
+    "example": "The constant noise is annoying."
+  },
+  {
+    "id": 307,
+    "part_of_speech": "v",
+    "original": "contact",
+    "translation_ru": "связываться",
+    "explanation_en": "to communicate with someone",
+    "unit": 6,
+    "example": "Please contact me later."
+  },
+  {
+    "id": 308,
+    "part_of_speech": "v",
+    "original": "enable",
+    "translation_ru": "давать возможность",
+    "explanation_en": "to make something possible",
+    "unit": 6,
+    "example": "This card enables you to enter."
+  },
+  {
+    "id": 309,
+    "part_of_speech": "n",
+    "original": "expertise",
+    "translation_ru": "экспертиза",
+    "explanation_en": "a high level of skill or knowledge in a particular area",
+    "unit": 6,
+    "example": "We need your expertise."
+  },
+  {
+    "id": 310,
+    "part_of_speech": "adj",
+    "original": "fixed",
+    "translation_ru": "фиксированный",
+    "explanation_en": "not changing; firmly set",
+    "unit": 6,
+    "example": "The price is fixed."
+  },
+  {
+    "id": 311,
+    "part_of_speech": "n",
+    "original": "incentive",
+    "translation_ru": "стимул",
+    "explanation_en": "something that motivates or encourages action",
+    "unit": 6,
+    "example": "Money is an incentive."
+  },
+  {
+    "id": 312,
+    "part_of_speech": "n",
+    "original": "income",
+    "translation_ru": "доход",
+    "explanation_en": "money earned from work or investments",
+    "unit": 6,
+    "example": "Their income increased."
+  },
+  {
+    "id": 313,
+    "part_of_speech": "n",
+    "original": "institution",
+    "translation_ru": "учреждение",
+    "explanation_en": "an established organization, especially for education or public service",
+    "unit": 6,
+    "example": "A financial institution."
+  },
+  {
+    "id": 314,
+    "part_of_speech": "v",
+    "original": "interpret",
+    "translation_ru": "интерпретировать",
+    "explanation_en": "to explain the meaning of something",
+    "unit": 6,
+    "example": "How do you interpret that?"
+  },
+  {
+    "id": 315,
+    "part_of_speech": "adj",
+    "original": "particular",
+    "translation_ru": "конкретный",
+    "explanation_en": "specific or special, not general",
+    "unit": 6,
+    "example": "Is there a particular reason?"
+  },
+  {
+    "id": 316,
+    "part_of_speech": "n",
+    "original": "pattern",
+    "translation_ru": "шаблон",
+    "explanation_en": "a repeated or regular way in which something happens",
+    "unit": 6,
+    "example": "Look for a pattern."
+  },
+  {
+    "id": 317,
+    "part_of_speech": "adj",
+    "original": "permanent",
+    "translation_ru": "постоянный",
+    "explanation_en": "lasting for a long time or forever",
+    "unit": 6,
+    "example": "This is a permanent position."
+  },
+  {
+    "id": 318,
+    "part_of_speech": "adj",
+    "original": "predictable",
+    "translation_ru": "предсказуемый",
+    "explanation_en": "able to be expected or known in advance",
+    "unit": 6,
+    "example": "The ending was predictable."
+  },
+  {
+    "id": 319,
+    "part_of_speech": "adj",
+    "original": "reluctant",
+    "translation_ru": "неохотный",
+    "explanation_en": "unwilling or hesitant to do something",
+    "unit": 6,
+    "example": "She was reluctant to go."
+  },
+  {
+    "id": 320,
+    "part_of_speech": "n",
+    "original": "transition",
+    "translation_ru": "переход",
+    "explanation_en": "the process of changing from one state or situation to another",
+    "unit": 6,
+    "example": "The transition was smooth."
+  },
+  {
+    "id": 321,
+    "part_of_speech": "v",
+    "original": "utilize",
+    "translation_ru": "использовать",
+    "explanation_en": "to use something effectively",
+    "unit": 6,
+    "example": "Utilize your resources."
+  },
+  {
+    "id": 322,
+    "part_of_speech": "adj",
+    "original": "abundant",
+    "translation_ru": "обильный",
+    "explanation_en": "existing in large quantities; more than enough",
+    "unit": 7,
+    "example": "There is abundant food."
+  },
+  {
+    "id": 323,
+    "part_of_speech": "v",
+    "original": "accommodate",
+    "translation_ru": "размещать, приспосабливаться",
+    "explanation_en": "to provide space for someone or something; to adapt or adjust",
+    "unit": 7,
+    "example": "The hotel accommodates 200 guests."
+  },
+  {
+    "id": 324,
+    "part_of_speech": "n",
+    "original": "alliance",
+    "translation_ru": "союз",
+    "explanation_en": "a partnership or agreement between groups or organizations",
+    "unit": 7,
+    "example": "They formed an alliance."
+  },
+  {
+    "id": 325,
+    "part_of_speech": "adj",
+    "original": "ample",
+    "translation_ru": "более чем достаточный",
+    "explanation_en": "more than enough; plentiful",
+    "unit": 7,
+    "example": "We have ample time."
+  },
+  {
+    "id": 326,
+    "part_of_speech": "adj",
+    "original": "controversial",
+    "translation_ru": "спорный",
+    "explanation_en": "causing disagreement or public debate",
+    "unit": 7,
+    "example": "The topic is controversial."
+  },
+  {
+    "id": 327,
+    "part_of_speech": "v",
+    "original": "disperse",
+    "translation_ru": "рассеивать",
+    "explanation_en": "to spread or scatter in different directions",
+    "unit": 7,
+    "example": "The crowd dispersed."
+  },
+  {
+    "id": 328,
+    "part_of_speech": "v",
+    "original": "dread",
+    "translation_ru": "бояться",
+    "explanation_en": "to fear something greatly or expect it with anxiety",
+    "unit": 7,
+    "example": "I dread going to the dentist."
+  },
+  {
+    "id": 329,
+    "part_of_speech": "adj",
+    "original": "ecological",
+    "translation_ru": "экологический",
+    "explanation_en": "relating to the environment or the relationships between living things",
+    "unit": 7,
+    "example": "Ecological balance."
+  },
+  {
+    "id": 330,
+    "part_of_speech": "adj",
+    "original": "empirical",
+    "translation_ru": "эмпирический",
+    "explanation_en": "based on observation or experience rather than theory",
+    "unit": 7,
+    "example": "We need empirical evidence."
+  },
+  {
+    "id": 331,
+    "part_of_speech": "n",
+    "original": "evidence",
+    "translation_ru": "доказательство",
+    "explanation_en": "information or facts that show something is true",
+    "unit": 7,
+    "example": "There is no evidence."
+  },
+  {
+    "id": 332,
+    "part_of_speech": "n",
+    "original": "expedition",
+    "translation_ru": "экспедиция",
+    "explanation_en": "an organized journey for a specific purpose, often exploration",
+    "unit": 7,
+    "example": "He joined an expedition to the Arctic."
+  },
+  {
+    "id": 333,
+    "part_of_speech": "n",
+    "original": "habitat",
+    "translation_ru": "среда обитания",
+    "explanation_en": "the natural environment where a plant or animal lives",
+    "unit": 7,
+    "example": "Protect the natural habitat."
+  },
+  {
+    "id": 334,
+    "part_of_speech": "v",
+    "original": "intervene",
+    "translation_ru": "вмешиваться",
+    "explanation_en": "to become involved in a situation in order to change or improve it",
+    "unit": 7,
+    "example": "The teacher had to intervene."
+  },
+  {
+    "id": 335,
+    "part_of_speech": "adv",
+    "original": "overwhelmingly",
+    "translation_ru": "подавляюще",
+    "explanation_en": "to an extremely great degree",
+    "unit": 7,
+    "example": "The vote was overwhelmingly in favor."
+  },
+  {
+    "id": 336,
+    "part_of_speech": "adj",
+    "original": "preliminary",
+    "translation_ru": "предварительный",
+    "explanation_en": "happening before the main part; introductory",
+    "unit": 7,
+    "example": "Preliminary results are in."
+  },
+  {
+    "id": 337,
+    "part_of_speech": "v",
+    "original": "propose",
+    "translation_ru": "предлагать",
+    "explanation_en": "to suggest an idea or plan for consideration",
+    "unit": 7,
+    "example": "I propose a toast."
+  },
+  {
+    "id": 338,
+    "part_of_speech": "n",
+    "original": "reserves",
+    "translation_ru": "запасы",
+    "explanation_en": "supplies kept for future use; protected natural areas",
+    "unit": 7,
+    "example": "The country has oil reserves."
+  },
+  {
+    "id": 339,
+    "part_of_speech": "adj",
+    "original": "resilient",
+    "translation_ru": "устойчивый",
+    "explanation_en": "able to recover quickly from difficulties",
+    "unit": 7,
+    "example": "She is very resilient."
+  },
+  {
+    "id": 340,
+    "part_of_speech": "v",
+    "original": "reveal",
+    "translation_ru": "раскрывать",
+    "explanation_en": "to make something known or visible",
+    "unit": 7,
+    "example": "He revealed the secret."
+  },
+  {
+    "id": 341,
+    "part_of_speech": "adj",
+    "original": "significant",
+    "translation_ru": "значительный",
+    "explanation_en": "important or noticeable",
+    "unit": 7,
+    "example": "There was a significant change."
+  },
+  {
+    "id": 342,
+    "part_of_speech": "adj",
+    "original": "sophisticated",
+    "translation_ru": "сложный, изощренный",
+    "explanation_en": "advanced, complex, or refined",
+    "unit": 7,
+    "example": "A sophisticated system."
+  },
+  {
+    "id": 343,
+    "part_of_speech": "adj",
+    "original": "sufficient",
+    "translation_ru": "достаточный",
+    "explanation_en": "enough to meet needs or requirements",
+    "unit": 7,
+    "example": "We have sufficient funds."
+  },
+  {
+    "id": 344,
+    "part_of_speech": "adj",
+    "original": "sustainable",
+    "translation_ru": "устойчивый (экологически)",
+    "explanation_en": "able to continue without harming the environment or resources",
+    "unit": 7,
+    "example": "Sustainable energy."
+  },
+  {
+    "id": 345,
+    "part_of_speech": "adv",
+    "original": "unduly",
+    "translation_ru": "чрезмерно",
+    "explanation_en": "excessively or more than is reasonable",
+    "unit": 7,
+    "example": "Don't be unduly worried."
+  },
+  {
+    "id": 346,
+    "part_of_speech": "n",
+    "original": "alleviation",
+    "translation_ru": "облегчение",
+    "explanation_en": "the act of making pain, problems, or suffering less severe",
+    "unit": 8,
+    "example": "The alleviation of poverty."
+  },
+  {
+    "id": 347,
+    "part_of_speech": "v",
+    "original": "attach",
+    "translation_ru": "прикреплять",
+    "explanation_en": "to fasten, join, or connect one thing to another",
+    "unit": 8,
+    "example": "Please attach the file."
+  },
+  {
+    "id": 348,
+    "part_of_speech": "n",
+    "original": "charity",
+    "translation_ru": "благотворительность",
+    "explanation_en": "an organization or act of helping people in need",
+    "unit": 8,
+    "example": "Donate to charity."
+  },
+  {
+    "id": 349,
+    "part_of_speech": "n",
+    "original": "convenience",
+    "translation_ru": "удобство",
+    "explanation_en": "the quality of being easy or suitable for use",
+    "unit": 8,
+    "example": "For your convenience."
+  },
+  {
+    "id": 350,
+    "part_of_speech": "n",
+    "original": "criteria",
+    "translation_ru": "критерии",
+    "explanation_en": "standards or rules used to judge or decide something",
+    "unit": 8,
+    "example": "What are the criteria?"
+  },
+  {
+    "id": 351,
+    "part_of_speech": "adj",
+    "original": "cumulative",
+    "translation_ru": "совокупный",
+    "explanation_en": "increasing or growing as a result of additions over time",
+    "unit": 8,
+    "example": "The cumulative effect."
+  },
+  {
+    "id": 352,
+    "part_of_speech": "n",
+    "original": "faculty",
+    "translation_ru": "преподавательский состав, способность",
+    "explanation_en": "the teaching staff of a university or a particular mental ability",
+    "unit": 8,
+    "example": "The faculty met today."
+  },
+  {
+    "id": 353,
+    "part_of_speech": "adj",
+    "original": "flexible",
+    "translation_ru": "гибкий",
+    "explanation_en": "able to bend easily or adapt to change",
+    "unit": 8,
+    "example": "We need flexible hours."
+  },
+  {
+    "id": 354,
+    "part_of_speech": "adj",
+    "original": "fragile",
+    "translation_ru": "хрупкий",
+    "explanation_en": "easily broken or damaged",
+    "unit": 8,
+    "example": "Handle with care, it's fragile."
+  },
+  {
+    "id": 355,
+    "part_of_speech": "v",
+    "original": "incur",
+    "translation_ru": "понести (убытки)",
+    "explanation_en": "to experience or bring upon oneself something unpleasant, such as costs or blame",
+    "unit": 8,
+    "example": "We may incur extra costs."
+  },
+  {
+    "id": 356,
+    "part_of_speech": "v",
+    "original": "induce",
+    "translation_ru": "вызывать, побуждать",
+    "explanation_en": "to cause or bring about something",
+    "unit": 8,
+    "example": "The drug induces sleep."
+  },
+  {
+    "id": 357,
+    "part_of_speech": "n",
+    "original": "locale",
+    "translation_ru": "место действия",
+    "explanation_en": "a particular place or setting",
+    "unit": 8,
+    "example": "The film's locale was Paris."
+  },
+  {
+    "id": 358,
+    "part_of_speech": "n",
+    "original": "methodology",
+    "translation_ru": "методология",
+    "explanation_en": "a system of methods used in a particular area of study or activity",
+    "unit": 8,
+    "example": "We need a strong methodology."
+  },
+  {
+    "id": 359,
+    "part_of_speech": "n",
+    "original": "output",
+    "translation_ru": "выработка",
+    "explanation_en": "the amount of something produced",
+    "unit": 8,
+    "example": "The factory increased output."
+  },
+  {
+    "id": 360,
+    "part_of_speech": "v",
+    "original": "prevail",
+    "translation_ru": "преобладать",
+    "explanation_en": "to succeed or be dominant after a struggle or competition",
+    "unit": 8,
+    "example": "Justice will prevail."
+  },
+  {
+    "id": 361,
+    "part_of_speech": "n",
+    "original": "ratio",
+    "translation_ru": "соотношение",
+    "explanation_en": "the relationship between two quantities",
+    "unit": 8,
+    "example": "The student-teacher ratio."
+  },
+  {
+    "id": 362,
+    "part_of_speech": "n",
+    "original": "relevance",
+    "translation_ru": "актуальность",
+    "explanation_en": "the quality of being closely connected to the matter at hand",
+    "unit": 8,
+    "example": "What is its relevance?"
+  },
+  {
+    "id": 363,
+    "part_of_speech": "adj",
+    "original": "respective",
+    "translation_ru": "соответствующий",
+    "explanation_en": "relating separately to each of two or more people or things",
+    "unit": 8,
+    "example": "Go to your respective seats."
+  },
+  {
+    "id": 364,
+    "part_of_speech": "v",
+    "original": "stabilize",
+    "translation_ru": "стабилизировать",
+    "explanation_en": "to make something steady or stable",
+    "unit": 8,
+    "example": "The patient's condition stabilized."
+  },
+  {
+    "id": 365,
+    "part_of_speech": "adj",
+    "original": "substantial",
+    "translation_ru": "существенный",
+    "explanation_en": "large in size, amount, or importance",
+    "unit": 8,
+    "example": "A substantial meal."
+  },
+  {
+    "id": 366,
+    "part_of_speech": "adj",
+    "original": "susceptible",
+    "translation_ru": "восприимчивый",
+    "explanation_en": "easily affected or influenced",
+    "unit": 8,
+    "example": "He is susceptible to colds."
+  },
+  {
+    "id": 367,
+    "part_of_speech": "v",
+    "original": "twist",
+    "translation_ru": "скручивать",
+    "explanation_en": "to turn or bend something out of its normal shape",
+    "unit": 8,
+    "example": "Twist the cap off."
+  },
+  {
+    "id": 368,
+    "part_of_speech": "adj",
+    "original": "vague",
+    "translation_ru": "неопределенный",
+    "explanation_en": "not clear or definite",
+    "unit": 8,
+    "example": "His directions were vague."
+  },
+  {
+    "id": 369,
+    "part_of_speech": "v",
+    "original": "vibrate",
+    "translation_ru": "вибрировать",
+    "explanation_en": "to move or shake rapidly back and forth",
+    "unit": 8,
+    "example": "The phone vibrated."
+  }
+];
+
+  // ---------- GLOBALS ----------
+  let vocabulary = [];       // full array
+  let learnedSet = new Set(); // stores word IDs that user marked as 'know'
+  let currentFilteredList = [];   // array of words based on units+mode
+  let currentIndex = 0;
+  let currentWordObj = null;
+  let isRevealed = false;
+
+  // UI state
+  let selectedUnits = new Set();     // store unit numbers (e.g., 7,8,9)
+  let currentMode = "selected";      // 'selected', 'all', 'unlearned'
+
+  // DOM elements
+  const unitsContainer = document.getElementById("unitsContainer");
+  const totalSpan = document.getElementById("totalWordsCount");
+  const learnedSpan = document.getElementById("learnedCount");
+  const remainingSpan = document.getElementById("remainingCount");
+  const resetProgressBtn = document.getElementById("resetAllProgressBtn");
+  const wordOriginalEl = document.getElementById("wordOriginal");
+  const partOfSpeechEl = document.getElementById("partOfSpeech");
+  const revealBlock = document.getElementById("revealBlock");
+  const translationTextEl = document.getElementById("translationText");
+  const exampleTextEl = document.getElementById("exampleText");
+  const revealBtn = document.getElementById("revealBtn");
+  const actionButtonsDiv = document.getElementById("actionButtons");
+  const knowBtn = document.getElementById("knowBtn");
+  const dontKnowBtn = document.getElementById("dontKnowBtn");
+  const progressMsgSpan = document.getElementById("progressMsg");
+  const modeBtns = document.querySelectorAll(".mode-btn");
+
+  // ----- helper: load/save learned to localStorage -----
+  function loadLearnedFromStorage() {
+    const stored = localStorage.getItem("lexicore_learned_ids");
+    if (stored) {
+      try {
+        const arr = JSON.parse(stored);
+        learnedSet = new Set(arr);
+      } catch(e) { learnedSet = new Set(); }
+    } else {
+      learnedSet = new Set();
+    }
+  }
+
+  function persistLearned() {
+    const arr = Array.from(learnedSet);
+    localStorage.setItem("lexicore_learned_ids", JSON.stringify(arr));
+    updateStats();
+  }
+
+  // stats update
+  function updateStats() {
+    const total = vocabulary.length;
+    const learnedCount = vocabulary.filter(w => learnedSet.has(w.id)).length;
+    const remainingCount = total - learnedCount;
+    totalSpan.innerText = total;
+    learnedSpan.innerText = learnedCount;
+    remainingSpan.innerText = remainingCount;
+    // also update progress message if needed
+    if (currentFilteredList.length === 0) {
+      progressMsgSpan.innerText = "✨ No words in current filter. Adjust units or mode.";
+    } else {
+      const currentLearnedInFilter = currentFilteredList.filter(w => learnedSet.has(w.id)).length;
+      progressMsgSpan.innerText = `📌 session: ${currentIndex+1} / ${currentFilteredList.length} words | ${currentLearnedInFilter} learned in this set`;
+    }
+  }
+
+  // build filtered list based on selectedUnits & mode
+  function buildFilteredList() {
+    let baseWords = [];
+    if (selectedUnits.size === 0) {
+      // if no units selected, fallback to all (but we can treat as empty)
+      baseWords = [];
+    } else {
+      baseWords = vocabulary.filter(word => selectedUnits.has(word.unit));
+    }
+
+    if (currentMode === "all") {
+      if (selectedUnits.size === 0) baseWords = [...vocabulary];
+      else baseWords = vocabulary.filter(word => selectedUnits.has(word.unit));
+    } 
+    else if (currentMode === "selected") {
+      // already baseWords selected by unit filter
+      if (selectedUnits.size === 0) baseWords = [];
+    } 
+    else if (currentMode === "unlearned") {
+      let filteredByUnit = (selectedUnits.size === 0) ? [...vocabulary] : vocabulary.filter(word => selectedUnits.has(word.unit));
+      baseWords = filteredByUnit.filter(word => !learnedSet.has(word.id));
+    }
+
+    // remove duplicates? none.
+    currentFilteredList = baseWords;
+    if (currentFilteredList.length === 0) {
+      currentIndex = 0;
+      currentWordObj = null;
+      renderEmptyState();
+    } else {
+      // reset index to 0 if index out of range
+      if (currentIndex >= currentFilteredList.length) currentIndex = 0;
+      currentWordObj = currentFilteredList[currentIndex];
+      renderCurrentWord();
+    }
+    updateStats();
+  }
+
+  function renderEmptyState() {
+    wordOriginalEl.innerText = "✨ No words";
+    partOfSpeechEl.innerText = "";
+    revealBlock.classList.add("hidden");
+    translationTextEl.innerText = "";
+    exampleTextEl.innerText = "";
+    actionButtonsDiv.style.display = "none";
+    revealBtn.style.display = "block";
+    progressMsgSpan.innerText = "⚠️ Adjust unit selection or mode to start learning.";
+    isRevealed = false;
+  }
+
+  function renderCurrentWord() {
+    if (!currentWordObj || currentFilteredList.length === 0) {
+      renderEmptyState();
+      return;
+    }
+    wordOriginalEl.innerText = currentWordObj.original;
+    partOfSpeechEl.innerText = currentWordObj.part_of_speech ? `(${currentWordObj.part_of_speech})` : "";
+    // reset reveal area
+    revealBlock.classList.add("hidden");
+    translationTextEl.innerText = "";
+    exampleTextEl.innerText = "";
+    isRevealed = false;
+    revealBtn.style.display = "block";
+    actionButtonsDiv.style.display = "none";
+    // update progress text
+    const learnedCountInSet = currentFilteredList.filter(w => learnedSet.has(w.id)).length;
+    progressMsgSpan.innerText = `📖 ${currentIndex+1} / ${currentFilteredList.length} | ✅ learned in filter: ${learnedCountInSet}`;
+  }
+
+  function revealTranslation() {
+    if (!currentWordObj) return;
+    translationTextEl.innerText = currentWordObj.translation_ru;
+    const exampleRaw = currentWordObj.example || "No example provided.";
+    exampleTextEl.innerText = `📖 Example: ${exampleRaw}`;
+    revealBlock.classList.remove("hidden");
+    revealBtn.style.display = "none";
+    actionButtonsDiv.style.display = "flex";
+    isRevealed = true;
+  }
+
+  function markAsKnown() {
+    if (!currentWordObj) return;
+    if (!learnedSet.has(currentWordObj.id)) {
+      learnedSet.add(currentWordObj.id);
+      persistLearned();
+    }
+    moveToNextWord();
+  }
+
+  function markAsUnknown() {
+    if (!currentWordObj) return;
+    // if word is learned we remove from learned set (optional: but user says "don't know" marks as not learned)
+    if (learnedSet.has(currentWordObj.id)) {
+      learnedSet.delete(currentWordObj.id);
+      persistLearned();
+    }
+    moveToNextWord();
+  }
+
+  function moveToNextWord() {
+    if (currentFilteredList.length === 0) {
+      buildFilteredList(); // rebuild safety
+      return;
+    }
+    // move to next index circular? but better to go next, if end -> loop or notify?
+    if (currentIndex + 1 < currentFilteredList.length) {
+      currentIndex++;
+      currentWordObj = currentFilteredList[currentIndex];
+      renderCurrentWord();
+    } else {
+      // reached end, loop from start
+      if (currentFilteredList.length > 0) {
+        currentIndex = 0;
+        currentWordObj = currentFilteredList[currentIndex];
+        renderCurrentWord();
+        progressMsgSpan.innerText = "🔄 End of set! Looping from start. 🎉";
+        setTimeout(() => updateStats(), 200);
+      } else {
+        renderEmptyState();
+      }
+    }
+    updateStats();
+  }
+
+  // reset progress: clear learnedSet for all words
+  function resetAllProgress() {
+    if (confirm("⚠️ Reset ALL learned words? This cannot be undone.")) {
+      learnedSet.clear();
+      persistLearned();
+      // rebuild current list to reflect unlearned if mode=unlearned
+      buildFilteredList();
+      updateStats();
+    }
+  }
+
+  // render unit chips (dynamic from vocabulary distinct units)
+  function renderUnits() {
+    const unitsSet = new Set();
+    vocabulary.forEach(w => unitsSet.add(w.unit));
+    const sortedUnits = Array.from(unitsSet).sort((a,b) => a-b);
+    unitsContainer.innerHTML = "";
+    sortedUnits.forEach(unit => {
+      const chip = document.createElement("div");
+      chip.classList.add("unit-chip");
+      if (selectedUnits.has(unit)) chip.setAttribute("data-selected", "true");
+      else chip.removeAttribute("data-selected");
+      chip.innerText = `Unit ${unit}`;
+      chip.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (selectedUnits.has(unit)) {
+          selectedUnits.delete(unit);
+          chip.removeAttribute("data-selected");
+        } else {
+          selectedUnits.add(unit);
+          chip.setAttribute("data-selected", "true");
+        }
+        // reset index for seamless experience
+        currentIndex = 0;
+        buildFilteredList();
+      });
+      unitsContainer.appendChild(chip);
+    });
+    if (sortedUnits.length === 0) unitsContainer.innerHTML = "<div style='padding:8px'>No units found.</div>";
+  }
+
+  // mode switching
+  function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      if (btn.getAttribute("data-mode") === mode) btn.classList.add("active-mode");
+      else btn.classList.remove("active-mode");
+    });
+    currentIndex = 0;
+    buildFilteredList();
+  }
+
+  // initialization: load vocabulary from hardcoded data (simulate data.json)
+  function initData() {
+    // clone raw data to avoid reference
+    vocabulary = RAW_DATA.map(item => ({ ...item }));
+    loadLearnedFromStorage();
+    // default selected units: all units present? but for better UX select unit 8 and 7? we'll select unit 8 by default
+    const distinctUnits = [...new Set(vocabulary.map(w => w.unit))];
+    if (distinctUnits.length) {
+      // pre-select first unit (or unit 8 if exists)
+      if (distinctUnits.includes(8)) selectedUnits.add(8);
+      else selectedUnits.add(distinctUnits[0]);
+      // optionally add another for demo? but simple
+    }
+    renderUnits();
+    setMode("selected");   // default mode
+    updateStats();
+  }
+
+  // Event listeners
+  revealBtn.addEventListener("click", revealTranslation);
+  knowBtn.addEventListener("click", markAsKnown);
+  dontKnowBtn.addEventListener("click", markAsUnknown);
+  resetProgressBtn.addEventListener("click", resetAllProgress);
+  modeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.getAttribute("data-mode");
+      if (mode === "selected") setMode("selected");
+      else if (mode === "all") setMode("all");
+      else if (mode === "unlearned") setMode("unlearned");
+    });
+  });
+
+  // start everything
+  initData();
+</script>
+</body>
+</html>
