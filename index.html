@@ -273,8 +273,11 @@
   <!-- learning mode -->
   <div class="mode-group">
     <button data-mode="selected" class="mode-btn active-mode">📌 Selected units</button>
-    <button data-mode="all" class="mode-btn">🌍 All words</button>
     <button data-mode="unlearned" class="mode-btn">⚠️ Only unlearned</button>
+    <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem; background: #1E293B; border-radius: 2rem; border: none; color: #CBD5E1; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+      <input type="checkbox" id="shuffleCheckbox" style="cursor: pointer; width: 1.1rem; height: 1.1rem;">
+      🎲 в разноброс
+    </label>
   </div>
 
   <!-- main study area -->
@@ -3636,7 +3639,8 @@
 
   // UI state
   let selectedUnits = new Set();     // store unit numbers (e.g., 7,8,9)
-  let currentMode = "selected";      // 'selected', 'all', 'unlearned'
+  let currentMode = "selected";      // 'selected', 'unlearned'
+  let shuffleEnabled = false;        // shuffle words flag
 
   // DOM elements
   const unitsContainer = document.getElementById("unitsContainer");
@@ -3655,6 +3659,7 @@
   const dontKnowBtn = document.getElementById("dontKnowBtn");
   const progressMsgSpan = document.getElementById("progressMsg");
   const modeBtns = document.querySelectorAll(".mode-btn");
+  const shuffleCheckbox = document.getElementById("shuffleCheckbox");
 
   // ----- helper: load/save learned to localStorage -----
   function loadLearnedFromStorage() {
@@ -3702,17 +3707,18 @@
       baseWords = vocabulary.filter(word => selectedUnits.has(word.unit));
     }
 
-    if (currentMode === "all") {
-      if (selectedUnits.size === 0) baseWords = [...vocabulary];
-      else baseWords = vocabulary.filter(word => selectedUnits.has(word.unit));
-    } 
-    else if (currentMode === "selected") {
+    if (currentMode === "selected") {
       // already baseWords selected by unit filter
       if (selectedUnits.size === 0) baseWords = [];
     } 
     else if (currentMode === "unlearned") {
       let filteredByUnit = (selectedUnits.size === 0) ? [...vocabulary] : vocabulary.filter(word => selectedUnits.has(word.unit));
       baseWords = filteredByUnit.filter(word => !learnedSet.has(word.id));
+    }
+
+    // shuffle if enabled
+    if (shuffleEnabled && baseWords.length > 0) {
+      baseWords = baseWords.sort(() => Math.random() - 0.5);
     }
 
     // remove duplicates? none.
@@ -3895,9 +3901,15 @@
     btn.addEventListener("click", () => {
       const mode = btn.getAttribute("data-mode");
       if (mode === "selected") setMode("selected");
-      else if (mode === "all") setMode("all");
       else if (mode === "unlearned") setMode("unlearned");
     });
+  });
+
+  // shuffle toggle
+  shuffleCheckbox.addEventListener("change", () => {
+    shuffleEnabled = shuffleCheckbox.checked;
+    currentIndex = 0;
+    buildFilteredList();
   });
 
   // start everything
