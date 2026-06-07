@@ -268,6 +268,18 @@
     <div style="margin-bottom: 0.5rem; font-weight: 600;">🎯 Units (tap to select)</div>
     <div id="unitsContainer" class="units-grid"></div>
     <div style="font-size: 0.7rem; margin-top: 6px; color:#818CF8;">* select one or multiple units</div>
+    
+    <!-- Part size settings -->
+    <div style="margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid #334155;">
+      <div style="font-size: 0.8rem; color: #94A3B8; margin-bottom: 0.5rem;">⚙️ Words per part: <span id="wordsPerPartValue">15</span></div>
+      <input type="range" id="wordsPerPartSlider" min="5" max="30" value="15" step="1" style="width: 100%; cursor: pointer; accent-color: #3B82F6;">
+    </div>
+  </div>
+
+  <!-- learning direction toggle -->
+  <div class="mode-group">
+    <button data-direction="forward" class="mode-btn active-mode">🇬🇧→🇷🇺 English→Russian</button>
+    <button data-direction="reverse" class="mode-btn">🇷🇺→🇬🇧 Russian→English</button>
   </div>
 
   <!-- learning mode -->
@@ -276,7 +288,7 @@
     <button data-mode="unlearned" class="mode-btn">⚠️ Only unlearned</button>
     <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem; background: #1E293B; border-radius: 2rem; border: none; color: #CBD5E1; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
       <input type="checkbox" id="shuffleCheckbox" style="cursor: pointer; width: 1.1rem; height: 1.1rem;">
-      🎲 в разноброс
+      🎲 Random
     </label>
   </div>
 
@@ -3638,9 +3650,11 @@
   let isRevealed = false;
 
   // UI state
-  let selectedUnits = new Set();     // store unit numbers (e.g., 7,8,9)
+  let selectedParts = new Set();     // store unit parts as "unit-part" (e.g., "1-1", "1-2")
   let currentMode = "selected";      // 'selected', 'unlearned'
+  let learningDirection = "forward"; // 'forward' (eng→rus), 'reverse' (rus→eng)
   let shuffleEnabled = false;        // shuffle words flag
+  let WORDS_PER_PART = 15;           // words per unit part (changeable via settings)
 
   // DOM elements
   const unitsContainer = document.getElementById("unitsContainer");
@@ -3659,7 +3673,10 @@
   const dontKnowBtn = document.getElementById("dontKnowBtn");
   const progressMsgSpan = document.getElementById("progressMsg");
   const modeBtns = document.querySelectorAll(".mode-btn");
+  const directionBtns = document.querySelectorAll("[data-direction]");
   const shuffleCheckbox = document.getElementById("shuffleCheckbox");
+  const wordsPerPartSlider = document.getElementById("wordsPerPartSlider");
+  const wordsPerPartValue = document.getElementById("wordsPerPartValue");
 
   // ----- helper: load/save learned to localStorage -----
   function loadLearnedFromStorage() {
@@ -3697,23 +3714,27 @@
     }
   }
 
-  // build filtered list based on selectedUnits & mode
+  // build filtered list based on selectedParts & mode
   function buildFilteredList() {
     let baseWords = [];
-    if (selectedUnits.size === 0) {
-      // if no units selected, fallback to all (but we can treat as empty)
+    if (selectedParts.size === 0) {
+      // if no parts selected, fallback to empty
       baseWords = [];
     } else {
-      baseWords = vocabulary.filter(word => selectedUnits.has(word.unit));
+      // collect words from all selected parts
+      selectedParts.forEach(partId => {
+        const [unit, part] = partId.split('-').map(Number);
+        baseWords = baseWords.concat(getPartWords(unit, part));
+      });
     }
 
     if (currentMode === "selected") {
-      // already baseWords selected by unit filter
-      if (selectedUnits.size === 0) baseWords = [];
+      // already baseWords selected by part filter
+      if (selectedParts.size === 0) baseWords = [];
     } 
     else if (currentMode === "unlearned") {
-      let filteredByUnit = (selectedUnits.size === 0) ? [...vocabulary] : vocabulary.filter(word => selectedUnits.has(word.unit));
-      baseWords = filteredByUnit.filter(word => !learnedSet.has(word.id));
+      let filteredWords = baseWords.filter(word => !learnedSet.has(word.id));
+      baseWords = filteredWords;
     }
 
     // shuffle if enabled
@@ -3753,7 +3774,14 @@
       renderEmptyState();
       return;
     }
-    wordOriginalEl.innerText = currentWordObj.original;
+    
+    // Show based on learning direction
+    if (learningDirection === "reverse") {
+      wordOriginalEl.innerText = currentWordObj.translation_ru;
+    } else {
+      wordOriginalEl.innerText = currentWordObj.original;
+    }
+    
     partOfSpeechEl.innerText = currentWordObj.part_of_speech ? `(${currentWordObj.part_of_speech})` : "";
     // reset reveal area
     revealBlock.classList.add("hidden");
@@ -3762,6 +3790,14 @@
     isRevealed = false;
     revealBtn.style.display = "block";
     actionButtonsDiv.style.display = "none";
+    
+    // Update reveal button text
+    if (learningDirection === "reverse") {
+      revealBtn.innerText = "🔎 SHOW ENGLISH WORD & DEFINITION";
+    } else {
+      revealBtn.innerText = "🔎 SHOW TRANSLATION & DEFINITION";
+    }
+    
     // update progress text
     const learnedCountInSet = currentFilteredList.filter(w => learnedSet.has(w.id)).length;
     progressMsgSpan.innerText = `📖 ${currentIndex+1} / ${currentFilteredList.length} | ✅ learned in filter: ${learnedCountInSet}`;
@@ -3769,9 +3805,19 @@
 
   function revealTranslation() {
     if (!currentWordObj) return;
-    translationTextEl.innerText = currentWordObj.translation_ru;
-    const exampleRaw = currentWordObj.example || "No example provided.";
-    exampleTextEl.innerText = `📖 Example: ${exampleRaw}`;
+    
+    if (learningDirection === "reverse") {
+      // Show English word and English definition
+      translationTextEl.innerText = currentWordObj.original;
+      const definitionRaw = currentWordObj.explanation_en || "No definition provided.";
+      exampleTextEl.innerText = `📚 Definition: ${definitionRaw}`;
+    } else {
+      // Show Russian translation and English definition
+      translationTextEl.innerText = currentWordObj.translation_ru;
+      const definitionRaw = currentWordObj.explanation_en || "No definition provided.";
+      exampleTextEl.innerText = `📚 Definition: ${definitionRaw}`;
+    }
+    
     revealBlock.classList.remove("hidden");
     revealBtn.style.display = "none";
     actionButtonsDiv.style.display = "flex";
@@ -3833,32 +3879,55 @@
     }
   }
 
-  // render unit chips (dynamic from vocabulary distinct units)
+  // helper: get words for a specific unit
+  function getUnitWords(unit) {
+    return vocabulary.filter(w => w.unit === unit);
+  }
+
+  // helper: get number of parts for a unit
+  function getPartCount(unit) {
+    const words = getUnitWords(unit);
+    return Math.ceil(words.length / WORDS_PER_PART);
+  }
+
+  // helper: get words for a specific unit part
+  function getPartWords(unit, part) {
+    const words = getUnitWords(unit);
+    const start = (part - 1) * WORDS_PER_PART;
+    const end = start + WORDS_PER_PART;
+    return words.slice(start, end);
+  }
+
+  // render unit parts as chips (dynamic from vocabulary distinct units)
   function renderUnits() {
     const unitsSet = new Set();
     vocabulary.forEach(w => unitsSet.add(w.unit));
     const sortedUnits = Array.from(unitsSet).sort((a,b) => a-b);
     unitsContainer.innerHTML = "";
     sortedUnits.forEach(unit => {
-      const chip = document.createElement("div");
-      chip.classList.add("unit-chip");
-      if (selectedUnits.has(unit)) chip.setAttribute("data-selected", "true");
-      else chip.removeAttribute("data-selected");
-      chip.innerText = `Unit ${unit}`;
-      chip.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (selectedUnits.has(unit)) {
-          selectedUnits.delete(unit);
-          chip.removeAttribute("data-selected");
-        } else {
-          selectedUnits.add(unit);
-          chip.setAttribute("data-selected", "true");
-        }
-        // reset index for seamless experience
-        currentIndex = 0;
-        buildFilteredList();
-      });
-      unitsContainer.appendChild(chip);
+      const partCount = getPartCount(unit);
+      for (let part = 1; part <= partCount; part++) {
+        const partId = `${unit}-${part}`;
+        const chip = document.createElement("div");
+        chip.classList.add("unit-chip");
+        if (selectedParts.has(partId)) chip.setAttribute("data-selected", "true");
+        else chip.removeAttribute("data-selected");
+        chip.innerText = partCount === 1 ? `Unit ${unit}` : `Unit ${unit} (${part}/${partCount})`;
+        chip.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (selectedParts.has(partId)) {
+            selectedParts.delete(partId);
+            chip.removeAttribute("data-selected");
+          } else {
+            selectedParts.add(partId);
+            chip.setAttribute("data-selected", "true");
+          }
+          // reset index for seamless experience
+          currentIndex = 0;
+          buildFilteredList();
+        });
+        unitsContainer.appendChild(chip);
+      }
     });
     if (sortedUnits.length === 0) unitsContainer.innerHTML = "<div style='padding:8px'>No units found.</div>";
   }
@@ -3874,18 +3943,27 @@
     buildFilteredList();
   }
 
+  // direction switching (forward: eng→rus, reverse: rus→eng)
+  function setDirection(direction) {
+    learningDirection = direction;
+    directionBtns.forEach(btn => {
+      if (btn.getAttribute("data-direction") === direction) btn.classList.add("active-mode");
+      else btn.classList.remove("active-mode");
+    });
+    currentIndex = 0;
+    renderCurrentWord();
+  }
+
   // initialization: load vocabulary from hardcoded data (simulate data.json)
   function initData() {
     // clone raw data to avoid reference
     vocabulary = RAW_DATA.map(item => ({ ...item }));
     loadLearnedFromStorage();
-    // default selected units: all units present? but for better UX select unit 8 and 7? we'll select unit 8 by default
+    // default selected parts: select first unit's first part
     const distinctUnits = [...new Set(vocabulary.map(w => w.unit))];
     if (distinctUnits.length) {
-      // pre-select first unit (or unit 8 if exists)
-      if (distinctUnits.includes(8)) selectedUnits.add(8);
-      else selectedUnits.add(distinctUnits[0]);
-      // optionally add another for demo? but simple
+      const firstUnit = distinctUnits.includes(1) ? 1 : distinctUnits[0];
+      selectedParts.add(`${firstUnit}-1`);
     }
     renderUnits();
     setMode("selected");   // default mode
@@ -3910,6 +3988,26 @@
     shuffleEnabled = shuffleCheckbox.checked;
     currentIndex = 0;
     buildFilteredList();
+  });
+
+  // words per part slider
+  wordsPerPartSlider.addEventListener("input", () => {
+    const newValue = parseInt(wordsPerPartSlider.value);
+    WORDS_PER_PART = newValue;
+    wordsPerPartValue.innerText = newValue;
+    selectedParts.clear();  // clear selections as parts have changed
+    currentIndex = 0;
+    renderUnits();
+    buildFilteredList();
+  });
+
+  // direction toggle (forward: eng→rus, reverse: rus→eng)
+  directionBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const direction = btn.getAttribute("data-direction");
+      if (direction === "forward") setDirection("forward");
+      else if (direction === "reverse") setDirection("reverse");
+    });
   });
 
   // start everything
